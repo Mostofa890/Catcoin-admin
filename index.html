@@ -7,404 +7,89 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f0f1a; color: #e0e0e0; min-height: 100vh; }
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0f0f1a;
-            color: #e0e0e0;
-            min-height: 100vh;
-        }
+        .sidebar { position: fixed; left: 0; top: 0; width: 250px; height: 100vh; background: #1a1a2e; padding: 20px; overflow-y: auto; border-right: 1px solid #2a2a4a; z-index: 100; }
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 15px 0 30px 0; border-bottom: 1px solid #2a2a4a; margin-bottom: 20px; }
+        .sidebar-brand i { font-size: 32px; color: #FF6B35; }
+        .sidebar-brand h2 { font-size: 20px; font-weight: 800; color: #fff; }
+        .sidebar-brand span { color: #FF6B35; }
         
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 250px;
-            height: 100vh;
-            background: #1a1a2e;
-            padding: 20px;
-            overflow-y: auto;
-            border-right: 1px solid #2a2a4a;
-            z-index: 100;
-        }
+        .nav-menu { list-style: none; }
+        .nav-menu li { margin-bottom: 4px; }
+        .nav-menu li a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #8a8a9a; text-decoration: none; transition: all 0.3s ease; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .nav-menu li a:hover, .nav-menu li a.active { background: #2a2a4a; color: #fff; }
+        .nav-menu li a i { width: 20px; text-align: center; font-size: 16px; }
+        .nav-menu li a .badge { margin-left: auto; background: #FF6B35; color: #fff; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px 0 30px 0;
-            border-bottom: 1px solid #2a2a4a;
-            margin-bottom: 20px;
-        }
+        .main-content { margin-left: 250px; padding: 30px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .top-bar h1 { font-size: 28px; font-weight: 800; }
+        .top-bar .user-info { display: flex; align-items: center; gap: 16px; background: #1a1a2e; padding: 10px 20px; border-radius: 12px; border: 1px solid #2a2a4a; }
+        .top-bar .user-info i { font-size: 24px; color: #FF6B35; }
         
-        .sidebar-brand i {
-            font-size: 32px;
-            color: #FF6B35;
-        }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .sidebar-brand h2 {
-            font-size: 20px;
-            font-weight: 800;
-            color: #fff;
-        }
-        
-        .sidebar-brand span {
-            color: #FF6B35;
-        }
-        
-        .nav-menu {
-            list-style: none;
-        }
-        
-        .nav-menu li {
-            margin-bottom: 4px;
-        }
-        
-        .nav-menu li a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: #8a8a9a;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .nav-menu li a:hover,
-        .nav-menu li a.active {
-            background: #2a2a4a;
-            color: #fff;
-        }
-        
-        .nav-menu li a i {
-            width: 20px;
-            text-align: center;
-            font-size: 16px;
-        }
-        
-        .nav-menu li a .badge {
-            margin-left: auto;
-            background: #FF6B35;
-            color: #fff;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-left: 250px;
-            padding: 30px;
-        }
-        
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .top-bar h1 {
-            font-size: 28px;
-            font-weight: 800;
-        }
-        
-        .top-bar .user-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: #1a1a2e;
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: 1px solid #2a2a4a;
-        }
-        
-        .top-bar .user-info i {
-            font-size: 24px;
-            color: #FF6B35;
-        }
-        
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: #1a1a2e;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid #2a2a4a;
-        }
-        
-        .stat-card .label {
-            font-size: 13px;
-            color: #8a8a9a;
-            font-weight: 500;
-        }
-        
-        .stat-card .value {
-            font-size: 28px;
-            font-weight: 800;
-            margin-top: 8px;
-        }
-        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #1a1a2e; padding: 20px; border-radius: 16px; border: 1px solid #2a2a4a; }
+        .stat-card .label { font-size: 13px; color: #8a8a9a; font-weight: 500; }
+        .stat-card .value { font-size: 28px; font-weight: 800; margin-top: 8px; }
         .stat-card .value.green { color: #4ade80; }
         .stat-card .value.orange { color: #FF6B35; }
         .stat-card .value.blue { color: #60a5fa; }
         .stat-card .value.purple { color: #a78bfa; }
         
-        /* Cards */
-        .card {
-            background: #1a1a2e;
-            border-radius: 16px;
-            border: 1px solid #2a2a4a;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
+        .card { background: #1a1a2e; border-radius: 16px; border: 1px solid #2a2a4a; padding: 24px; margin-bottom: 24px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .card-header h3 { font-size: 18px; font-weight: 700; }
         
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #FF6B35; color: #fff; }
+        .btn-primary:hover { background: #e85d2a; transform: translateY(-2px); }
+        .btn-success { background: #4ade80; color: #0f0f1a; }
+        .btn-success:hover { background: #22c55e; transform: translateY(-2px); }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+        .btn-secondary { background: #2a2a4a; color: #fff; }
+        .btn-secondary:hover { background: #3a3a5a; transform: translateY(-2px); }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
         
-        .card-header h3 {
-            font-size: 18px;
-            font-weight: 700;
-        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #8a8a9a; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: #0f0f1a; border: 1px solid #2a2a4a; border-radius: 10px; color: #e0e0e0; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #FF6B35; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         
-        /* Buttons */
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #2a2a4a; }
+        table th { font-size: 12px; font-weight: 600; color: #8a8a9a; text-transform: uppercase; letter-spacing: 0.5px; }
+        table td { font-size: 14px; }
         
-        .btn-primary {
-            background: #FF6B35;
-            color: #fff;
-        }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-badge.pending { background: #f59e0b20; color: #f59e0b; }
+        .status-badge.success { background: #4ade8020; color: #4ade80; }
+        .status-badge.failed { background: #ef444420; color: #ef4444; }
         
-        .btn-primary:hover {
-            background: #e85d2a;
-            transform: translateY(-2px);
-        }
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 16px 24px; border-radius: 12px; font-weight: 600; z-index: 9999; animation: slideUp 0.4s ease; }
+        .toast.success { background: #4ade80; color: #0f0f1a; }
+        .toast.error { background: #ef4444; color: #fff; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .btn-success {
-            background: #4ade80;
-            color: #0f0f1a;
-        }
-        
-        .btn-success:hover {
-            background: #22c55e;
-            transform: translateY(-2px);
-        }
-        
-        .btn-danger {
-            background: #ef4444;
-            color: #fff;
-        }
-        
-        .btn-danger:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: #2a2a4a;
-            color: #fff;
-        }
-        
-        .btn-secondary:hover {
-            background: #3a3a5a;
-            transform: translateY(-2px);
-        }
-        
-        .btn-sm {
-            padding: 6px 14px;
-            font-size: 12px;
-        }
-        
-        /* Forms */
-        .form-group {
-            margin-bottom: 16px;
-        }
-        
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #8a8a9a;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            background: #0f0f1a;
-            border: 1px solid #2a2a4a;
-            border-radius: 10px;
-            color: #e0e0e0;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #FF6B35;
-        }
-        
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        table th,
-        table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #2a2a4a;
-        }
-        
-        table th {
-            font-size: 12px;
-            font-weight: 600;
-            color: #8a8a9a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        table td {
-            font-size: 14px;
-        }
-        
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-badge.pending {
-            background: #f59e0b20;
-            color: #f59e0b;
-        }
-        
-        .status-badge.success {
-            background: #4ade8020;
-            color: #4ade80;
-        }
-        
-        .status-badge.failed {
-            background: #ef444420;
-            color: #ef4444;
-        }
-        
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            z-index: 9999;
-            animation: slideUp 0.4s ease;
-        }
-        
-        .toast.success {
-            background: #4ade80;
-            color: #0f0f1a;
-        }
-        
-        .toast.error {
-            background: #ef4444;
-            color: #fff;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .hidden { display: none !important; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .gap-2 { gap: 8px; }
-        .gap-4 { gap: 16px; }
-        .mt-4 { margin-top: 16px; }
-        .mb-4 { margin-bottom: 16px; }
         .text-center { text-align: center; }
         .text-muted { color: #8a8a9a; }
+        .hidden { display: none !important; }
         
-        /* Responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                padding: 12px;
-            }
+            .sidebar { width: 70px; padding: 12px; }
             .sidebar-brand h2 { display: none; }
             .sidebar-brand span { display: none; }
             .nav-menu li a span { display: none; }
@@ -416,7 +101,6 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f0f1a; }
         ::-webkit-scrollbar-thumb { background: #2a2a4a; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3a3a5a; }
     </style>
 </head>
 <body>
@@ -445,52 +129,27 @@
             </div>
         </div>
 
-        <!-- ========== DASHBOARD ========== -->
+        <!-- Dashboard -->
         <div id="page-dashboard" class="page active">
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="label">Total Users</div>
-                    <div class="value blue" id="total-users">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Total Earnings</div>
-                    <div class="value green" id="total-earnings">$0.000</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Pending Withdrawals</div>
-                    <div class="value orange" id="pending-withdrawals">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Total Ads Watched</div>
-                    <div class="value purple" id="total-ads">0</div>
-                </div>
+                <div class="stat-card"><div class="label">Total Users</div><div class="value blue" id="total-users">0</div></div>
+                <div class="stat-card"><div class="label">Total Earnings</div><div class="value green" id="total-earnings">$0.000</div></div>
+                <div class="stat-card"><div class="label">Pending Withdrawals</div><div class="value orange" id="pending-withdrawals">0</div></div>
+                <div class="stat-card"><div class="label">Total Ads Watched</div><div class="value purple" id="total-ads">0</div></div>
             </div>
 
             <div class="card">
-                <div class="card-header">
-                    <h3>Recent Withdrawals</h3>
-                </div>
+                <div class="card-header"><h3>Recent Withdrawals</h3></div>
                 <div class="table-container">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Method</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recent-withdrawals">
-                            <tr><td colspan="6" class="text-center text-muted">No withdrawals yet</td></tr>
-                        </tbody>
+                        <thead><tr><th>User</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+                        <tbody id="recent-withdrawals"><tr><td colspan="6" class="text-center text-muted">No withdrawals yet</td></tr></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ========== CONFIGURATION ========== -->
+        <!-- Configuration -->
         <div id="page-config" class="page">
             <div class="card">
                 <div class="card-header">
@@ -499,64 +158,28 @@
                 </div>
                 <form id="config-form">
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>App Name</label>
-                            <input type="text" id="app-name" value="Cat Coins - Earn Money">
-                        </div>
-                        <div class="form-group">
-                            <label>Bot Token</label>
-                            <input type="text" id="bot-token" placeholder="Enter bot token">
-                        </div>
+                        <div class="form-group"><label>App Name</label><input type="text" id="app-name" value="Cat Coins - Earn Money"></div>
+                        <div class="form-group"><label>Bot Token</label><input type="text" id="bot-token" placeholder="Enter bot token"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Bot Username</label>
-                            <input type="text" id="bot-username" placeholder="@botusername">
-                        </div>
-                        <div class="form-group">
-                            <label>Admin IDs (comma separated)</label>
-                            <input type="text" id="admin-ids" placeholder="123456,789012">
-                        </div>
+                        <div class="form-group"><label>Bot Username</label><input type="text" id="bot-username" placeholder="@botusername"></div>
+                        <div class="form-group"><label>Admin IDs (comma separated)</label><input type="text" id="admin-ids" placeholder="123456,789012"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Channel Link</label>
-                            <input type="text" id="channel-link" placeholder="https://t.me/channel">
-                        </div>
-                        <div class="form-group">
-                            <label>Support Link</label>
-                            <input type="text" id="support-link" placeholder="https://t.me/admin">
-                        </div>
+                        <div class="form-group"><label>Channel Link</label><input type="text" id="channel-link" placeholder="https://t.me/channel"></div>
+                        <div class="form-group"><label>Support Link</label><input type="text" id="support-link" placeholder="https://t.me/admin"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Ad Reward ($)</label>
-                            <input type="number" id="ad-reward" step="0.001" value="0.001">
-                        </div>
-                        <div class="form-group">
-                            <label>Daily Ad Limit</label>
-                            <input type="number" id="daily-limit" value="15">
-                        </div>
+                        <div class="form-group"><label>Ad Reward ($)</label><input type="number" id="ad-reward" step="0.001" value="0.001"></div>
+                        <div class="form-group"><label>Daily Ad Limit</label><input type="number" id="daily-limit" value="15"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Minimum Withdrawal ($)</label>
-                            <input type="number" id="min-withdraw" step="0.01" value="0.10">
-                        </div>
-                        <div class="form-group">
-                            <label>Cooldown (minutes)</label>
-                            <input type="number" id="cooldown" value="30">
-                        </div>
+                        <div class="form-group"><label>Minimum Withdrawal ($)</label><input type="number" id="min-withdraw" step="0.01" value="0.10"></div>
+                        <div class="form-group"><label>Cooldown (minutes)</label><input type="number" id="cooldown" value="30"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Referral Reward ($)</label>
-                            <input type="number" id="referral-reward" step="0.001" value="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label>Monetag Zone ID</label>
-                            <input type="text" id="zone-id" value="11573980">
-                        </div>
+                        <div class="form-group"><label>Referral Reward ($)</label><input type="number" id="referral-reward" step="0.001" value="0.01"></div>
+                        <div class="form-group"><label>Monetag Zone ID</label><input type="text" id="zone-id" value="11573980"></div>
                     </div>
                     <div class="form-group">
                         <label>Withdrawal Methods (one per line)</label>
@@ -578,7 +201,7 @@ Nogad</textarea>
             </div>
         </div>
 
-        <!-- ========== WITHDRAWALS ========== -->
+        <!-- Withdrawals -->
         <div id="page-withdrawals" class="page">
             <div class="card">
                 <div class="card-header">
@@ -587,26 +210,14 @@ Nogad</textarea>
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Method</th>
-                                <th>Account</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="withdrawals-table">
-                            <tr><td colspan="7" class="text-center text-muted">No withdrawals found</td></tr>
-                        </tbody>
+                        <thead><tr><th>User</th><th>Method</th><th>Account</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+                        <tbody id="withdrawals-table"><tr><td colspan="7" class="text-center text-muted">No withdrawals found</td></tr></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ========== USERS ========== -->
+        <!-- Users -->
         <div id="page-users" class="page">
             <div class="card">
                 <div class="card-header">
@@ -615,34 +226,21 @@ Nogad</textarea>
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>User ID</th>
-                                <th>Name</th>
-                                <th>Username</th>
-                                <th>Balance</th>
-                                <th>Ads</th>
-                                <th>Referrals</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table">
-                            <tr><td colspan="6" class="text-center text-muted">Loading users...</td></tr>
-                        </tbody>
+                        <thead><tr><th>User ID</th><th>Name</th><th>Username</th><th>Balance</th><th>Ads</th><th>Referrals</th></tr></thead>
+                        <tbody id="users-table"><tr><td colspan="6" class="text-center text-muted">Loading users...</td></tr></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ========== BONUS TASKS ========== -->
+        <!-- Bonus Tasks -->
         <div id="page-bonus" class="page">
             <div class="card">
                 <div class="card-header">
                     <h3>Bonus Tasks</h3>
                     <button class="btn btn-primary" onclick="addBonusTask()"><i class="fa-solid fa-plus"></i> Add Task</button>
                 </div>
-                <div id="bonus-tasks-list">
-                    <p class="text-center text-muted">Loading bonus tasks...</p>
-                </div>
+                <div id="bonus-tasks-list"><p class="text-center text-muted">Loading bonus tasks...</p></div>
             </div>
         </div>
     </div>
@@ -694,7 +292,7 @@ Nogad</textarea>
         });
 
         // ============================================================
-        // TOAST NOTIFICATION
+        // TOAST
         // ============================================================
         function showToast(message, type = 'success') {
             const existing = document.querySelector('.toast');
@@ -712,7 +310,6 @@ Nogad</textarea>
         function loadDashboard() {
             if (!firebaseDb) return;
             
-            // Load users
             firebaseDb.ref('users').once('value').then(snapshot => {
                 const users = snapshot.val() || {};
                 const userIds = Object.keys(users);
@@ -727,9 +324,8 @@ Nogad</textarea>
                 });
                 document.getElementById('total-earnings').textContent = '$' + totalEarnings.toFixed(3);
                 document.getElementById('total-ads').textContent = totalAds;
-            }).catch(err => console.error("Error loading users:", err));
+            });
             
-            // Load withdrawals
             firebaseDb.ref('withdrawals').once('value').then(snapshot => {
                 const wds = snapshot.val() || {};
                 const pending = Object.values(wds).filter(w => w.status === 'Pending');
@@ -757,7 +353,7 @@ Nogad</textarea>
                         </tr>
                     `).join('');
                 }
-            }).catch(err => console.error("Error loading withdrawals:", err));
+            });
         }
 
         // ============================================================
@@ -792,7 +388,7 @@ Nogad</textarea>
                         </tr>
                     `).join('');
                 }
-            }).catch(err => console.error("Error loading withdrawals:", err));
+            });
         }
 
         function approveWithdrawal(id) {
@@ -859,7 +455,7 @@ Nogad</textarea>
                         </tr>
                     `).join('');
                 }
-            }).catch(err => console.error("Error loading users:", err));
+            });
         }
 
         // ============================================================
@@ -887,7 +483,7 @@ Nogad</textarea>
                         </div>
                     `).join('');
                 }
-            }).catch(err => console.error("Error loading bonus tasks:", err));
+            });
         }
 
         function addBonusTask() {
@@ -990,7 +586,7 @@ Nogad</textarea>
                     document.getElementById('withdraw-methods').value = config.withdrawMethods?.join('\n') || 'Binance UID\nBikash\nNogad';
                     document.getElementById('welcome-msg').value = config.welcomeMessage || '';
                 }
-            }).catch(err => console.error("Error loading config:", err));
+            });
         }
 
         // ============================================================
@@ -999,7 +595,6 @@ Nogad</textarea>
         loadConfig();
         loadDashboard();
 
-        // Auto-refresh every 30 seconds
         setInterval(() => {
             const active = document.querySelector('.page.active');
             if (active) {
