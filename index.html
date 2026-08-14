@@ -86,7 +86,6 @@
         
         .text-center { text-align: center; }
         .text-muted { color: #8a8a9a; }
-        .hidden { display: none !important; }
         
         @media (max-width: 768px) {
             .sidebar { width: 70px; padding: 12px; }
@@ -104,7 +103,6 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-brand">
             <i class="fa-solid fa-cat"></i>
@@ -119,7 +117,6 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="top-bar">
             <h1 id="page-title">Dashboard</h1>
@@ -183,7 +180,7 @@
                     </div>
                     <div class="form-group">
                         <label>Withdrawal Methods (one per line)</label>
-                        <textarea id="withdraw-methods" rows="3">Binance UID
+                        <textarea id="withdraw-methods" rows="3">Binance
 Bikash
 Nogad</textarea>
                     </div>
@@ -246,9 +243,6 @@ Nogad</textarea>
     </div>
 
     <script>
-        // ============================================================
-        // FIREBASE CONFIG
-        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
             authDomain: "cat-coins-34d4c.firebaseapp.com",
@@ -261,7 +255,6 @@ Nogad</textarea>
 
         let firebaseDb;
 
-        // Initialize Firebase
         try {
             firebase.initializeApp(firebaseConfig);
             firebaseDb = firebase.database();
@@ -271,9 +264,7 @@ Nogad</textarea>
             alert("Firebase connection failed. Please check your configuration.");
         }
 
-        // ============================================================
-        // NAVIGATION
-        // ============================================================
+        // Navigation
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -291,9 +282,6 @@ Nogad</textarea>
             });
         });
 
-        // ============================================================
-        // TOAST
-        // ============================================================
         function showToast(message, type = 'success') {
             const existing = document.querySelector('.toast');
             if (existing) existing.remove();
@@ -304,9 +292,7 @@ Nogad</textarea>
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // ============================================================
-        // DASHBOARD
-        // ============================================================
+        // Dashboard
         function loadDashboard() {
             if (!firebaseDb) return;
             
@@ -356,9 +342,7 @@ Nogad</textarea>
             });
         }
 
-        // ============================================================
-        // WITHDRAWALS
-        // ============================================================
+        // Withdrawals
         function loadWithdrawals() {
             if (!firebaseDb) return;
             firebaseDb.ref('withdrawals').once('value').then(snapshot => {
@@ -432,9 +416,7 @@ Nogad</textarea>
             });
         }
 
-        // ============================================================
-        // USERS
-        // ============================================================
+        // Users
         function loadUsers() {
             if (!firebaseDb) return;
             firebaseDb.ref('users').once('value').then(snapshot => {
@@ -458,9 +440,7 @@ Nogad</textarea>
             });
         }
 
-        // ============================================================
-        // BONUS TASKS
-        // ============================================================
+        // Bonus Tasks
         function loadBonusTasks() {
             if (!firebaseDb) return;
             firebaseDb.ref('bonusTasks').once('value').then(snapshot => {
@@ -475,6 +455,7 @@ Nogad</textarea>
                                 <strong>${task.title || 'Untitled'}</strong>
                                 <span style="color:#FF6B35; margin-left:12px;">+$${task.reward?.toFixed(3) || '0'}</span>
                                 <span style="color:#8a8a9a; font-size:12px; margin-left:12px;">${task.duration || 10}s</span>
+                                <span style="color:#60a5fa; font-size:12px; margin-left:12px;">${task.link || ''}</span>
                             </div>
                             <div>
                                 <button class="btn btn-secondary btn-sm" onclick="editBonusTask(${index})"><i class="fa-solid fa-edit"></i></button>
@@ -535,9 +516,7 @@ Nogad</textarea>
             });
         }
 
-        // ============================================================
-        // SAVE CONFIGURATION
-        // ============================================================
+        // Save Configuration
         function saveConfig() {
             const config = {
                 appName: document.getElementById('app-name').value,
@@ -563,9 +542,7 @@ Nogad</textarea>
             });
         }
 
-        // ============================================================
-        // LOAD CONFIGURATION
-        // ============================================================
+        // Load Configuration
         function loadConfig() {
             if (!firebaseDb) return;
             firebaseDb.ref('adminConfig').once('value').then(snapshot => {
@@ -583,15 +560,13 @@ Nogad</textarea>
                     document.getElementById('cooldown').value = config.cooldown || 30;
                     document.getElementById('referral-reward').value = config.referralReward || 0.01;
                     document.getElementById('zone-id').value = config.zoneId || '11573980';
-                    document.getElementById('withdraw-methods').value = config.withdrawMethods?.join('\n') || 'Binance UID\nBikash\nNogad';
+                    document.getElementById('withdraw-methods').value = config.withdrawMethods?.join('\n') || 'Binance\nBikash\nNogad';
                     document.getElementById('welcome-msg').value = config.welcomeMessage || '';
                 }
             });
         }
 
-        // ============================================================
-        // INITIALIZE
-        // ============================================================
+        // Initialize
         loadConfig();
         loadDashboard();
 
