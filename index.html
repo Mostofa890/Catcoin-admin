@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Cat Coins</title>
+    <title>Admin Panel - NexEarn</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -86,6 +86,21 @@
         
         .text-center { text-align: center; }
         .text-muted { color: #8a8a9a; }
+        .mt-2 { margin-top: 8px; }
+        
+        /* Method tags in withdrawals */
+        .method-tag { 
+            display: inline-block; 
+            padding: 2px 10px; 
+            border-radius: 12px; 
+            font-size: 11px; 
+            font-weight: 600;
+            background: #2a2a4a;
+            color: #e0e0e0;
+        }
+        .method-tag.binance { background: #f0b90b20; color: #f0b90b; }
+        .method-tag.bikash { background: #e91e6320; color: #e91e63; }
+        .method-tag.nogad { background: #00bcd420; color: #00bcd4; }
         
         @media (max-width: 768px) {
             .sidebar { width: 70px; padding: 12px; }
@@ -103,10 +118,11 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-brand">
             <i class="fa-solid fa-cat"></i>
-            <h2>Cat<span>Coins</span></h2>
+            <h2>Nex<span>Earn</span></h2>
         </div>
         <ul class="nav-menu">
             <li><a class="active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a></li>
@@ -117,6 +133,7 @@
         </ul>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
         <div class="top-bar">
             <h1 id="page-title">Dashboard</h1>
@@ -155,7 +172,7 @@
                 </div>
                 <form id="config-form">
                     <div class="form-row">
-                        <div class="form-group"><label>App Name</label><input type="text" id="app-name" value="Cat Coins - Earn Money"></div>
+                        <div class="form-group"><label>App Name</label><input type="text" id="app-name" value="NexEarn"></div>
                         <div class="form-group"><label>Bot Token</label><input type="text" id="bot-token" placeholder="Enter bot token"></div>
                     </div>
                     <div class="form-row">
@@ -178,12 +195,20 @@
                         <div class="form-group"><label>Referral Reward ($)</label><input type="number" id="referral-reward" step="0.001" value="0.01"></div>
                         <div class="form-group"><label>Monetag Zone ID</label><input type="text" id="zone-id" value="11573980"></div>
                     </div>
+                    
+                    <!-- Payment Methods - FIXED -->
                     <div class="form-group">
-                        <label>Withdrawal Methods (one per line)</label>
-                        <textarea id="withdraw-methods" rows="3">Binance
+                        <label>Payment Methods (one per line)</label>
+                        <div class="field-hint" style="font-size:12px; color:#8a8a9a; margin-bottom:8px;">
+                            <i class="fa-solid fa-info-circle"></i> 
+                            Each line will appear as a separate withdrawal method in the user app.
+                            <br>Example: Binance, Bikash, Nogad, PayPal, etc.
+                        </div>
+                        <textarea id="withdraw-methods" rows="4" placeholder="Enter each method on a new line">Binance
 Bikash
 Nogad</textarea>
                     </div>
+                    
                     <div class="form-group">
                         <label>Welcome Message</label>
                         <textarea id="welcome-msg" rows="6">Please follow the rules to ensure you receive your payment.
@@ -243,6 +268,9 @@ Nogad</textarea>
     </div>
 
     <script>
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
             authDomain: "cat-coins-34d4c.firebaseapp.com",
@@ -264,7 +292,9 @@ Nogad</textarea>
             alert("Firebase connection failed. Please check your configuration.");
         }
 
-        // Navigation
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -282,6 +312,9 @@ Nogad</textarea>
             });
         });
 
+        // ============================================================
+        // TOAST
+        // ============================================================
         function showToast(message, type = 'success') {
             const existing = document.querySelector('.toast');
             if (existing) existing.remove();
@@ -292,7 +325,9 @@ Nogad</textarea>
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // Dashboard
+        // ============================================================
+        // DASHBOARD
+        // ============================================================
         function loadDashboard() {
             if (!firebaseDb) return;
             
@@ -326,7 +361,7 @@ Nogad</textarea>
                     tbody.innerHTML = recent.map(w => `
                         <tr>
                             <td>${w.userName || 'N/A'}</td>
-                            <td>${w.method || 'N/A'}</td>
+                            <td><span class="method-tag ${w.method?.toLowerCase()}">${w.method || 'N/A'}</span></td>
                             <td>$${w.amount?.toFixed(3) || '0'}</td>
                             <td><span class="status-badge ${w.status?.toLowerCase()}">${w.status || 'Pending'}</span></td>
                             <td>${new Date(w.date).toLocaleDateString()}</td>
@@ -342,7 +377,9 @@ Nogad</textarea>
             });
         }
 
-        // Withdrawals
+        // ============================================================
+        // WITHDRAWALS
+        // ============================================================
         function loadWithdrawals() {
             if (!firebaseDb) return;
             firebaseDb.ref('withdrawals').once('value').then(snapshot => {
@@ -357,7 +394,7 @@ Nogad</textarea>
                     tbody.innerHTML = items.map(w => `
                         <tr>
                             <td>${w.userName || 'N/A'}</td>
-                            <td>${w.method || 'N/A'}</td>
+                            <td><span class="method-tag ${w.method?.toLowerCase()}">${w.method || 'N/A'}</span></td>
                             <td>${w.accountNumber || 'N/A'}</td>
                             <td>$${w.amount?.toFixed(3) || '0'}</td>
                             <td><span class="status-badge ${w.status?.toLowerCase()}">${w.status || 'Pending'}</span></td>
@@ -416,7 +453,9 @@ Nogad</textarea>
             });
         }
 
-        // Users
+        // ============================================================
+        // USERS
+        // ============================================================
         function loadUsers() {
             if (!firebaseDb) return;
             firebaseDb.ref('users').once('value').then(snapshot => {
@@ -440,7 +479,9 @@ Nogad</textarea>
             });
         }
 
-        // Bonus Tasks
+        // ============================================================
+        // BONUS TASKS
+        // ============================================================
         function loadBonusTasks() {
             if (!firebaseDb) return;
             firebaseDb.ref('bonusTasks').once('value').then(snapshot => {
@@ -516,8 +557,16 @@ Nogad</textarea>
             });
         }
 
-        // Save Configuration
+        // ============================================================
+        // SAVE CONFIGURATION (FIXED)
+        // ============================================================
         function saveConfig() {
+            // Get payment methods - split by newline and filter empty
+            const methodsRaw = document.getElementById('withdraw-methods').value;
+            const methods = methodsRaw.split('\n')
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+            
             const config = {
                 appName: document.getElementById('app-name').value,
                 botToken: document.getElementById('bot-token').value,
@@ -531,24 +580,34 @@ Nogad</textarea>
                 cooldown: parseInt(document.getElementById('cooldown').value) || 30,
                 referralReward: parseFloat(document.getElementById('referral-reward').value) || 0.01,
                 zoneId: document.getElementById('zone-id').value,
-                withdrawMethods: document.getElementById('withdraw-methods').value.split('\n').filter(s => s.trim()),
+                withdrawMethods: methods,
                 welcomeMessage: document.getElementById('welcome-msg').value
             };
             
+            // Validate methods
+            if (methods.length === 0) {
+                showToast('❌ Please add at least one payment method!', 'error');
+                return;
+            }
+            
             firebaseDb.ref('adminConfig').set(config).then(() => {
                 showToast('✅ Configuration saved successfully!');
+                // Reload config to show updated values
+                loadConfig();
             }).catch(err => {
                 showToast('❌ Failed to save: ' + err.message, 'error');
             });
         }
 
-        // Load Configuration
+        // ============================================================
+        // LOAD CONFIGURATION
+        // ============================================================
         function loadConfig() {
             if (!firebaseDb) return;
             firebaseDb.ref('adminConfig').once('value').then(snapshot => {
                 const config = snapshot.val();
                 if (config) {
-                    document.getElementById('app-name').value = config.appName || 'Cat Coins - Earn Money';
+                    document.getElementById('app-name').value = config.appName || 'NexEarn';
                     document.getElementById('bot-token').value = config.botToken || '';
                     document.getElementById('bot-username').value = config.botUsername || '';
                     document.getElementById('admin-ids').value = config.adminIds?.join(', ') || '';
@@ -566,7 +625,9 @@ Nogad</textarea>
             });
         }
 
-        // Initialize
+        // ============================================================
+        // INITIALIZE
+        // ============================================================
         loadConfig();
         loadDashboard();
 
