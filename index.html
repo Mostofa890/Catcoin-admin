@@ -113,6 +113,12 @@
         <div class="form-group"><label>Minimum Withdraw Amount</label><input type="number" id="minWithdraw" placeholder="10"></div>
         <div class="form-group"><label>Withdraw Notice Text</label><textarea id="withdrawNotice" rows="2" placeholder="Example: Payment will be sent in 24 hours"></textarea></div>
         <div class="form-group"><label>Payment Methods (Comma separated)</label><input type="text" id="paymentMethods" placeholder="Bkash, Nagad, Binance"></div>
+        <div style="margin-top:15px; padding:12px; background:rgba(108,92,231,0.05); border-radius:12px; border:1px solid rgba(108,92,231,0.1);">
+          <h4 style="font-size:0.9rem; color:var(--primary); margin-bottom:8px;"><i class="fas fa-layer-group"></i> Withdraw Levels Configuration</h4>
+          <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">Each level defines required referrals, fee percentage, amount range and processing time.</p>
+          <div id="withdrawLevelsContainer"></div>
+          <button class="btn btn-green btn-small" onclick="addWithdrawLevel()" style="width:auto; padding:8px 16px; font-size:0.8rem; margin-top:5px;"><i class="fas fa-plus"></i> Add Level</button>
+        </div>
       </div>
       <button class="btn" onclick="saveSettings()"><i class="fas fa-save"></i> Save General Settings</button>
     </div>
@@ -181,8 +187,8 @@
           <input type="text" id="maintenanceMsg" placeholder="We're updating our system...">
         </div>
         <div class="form-group">
-          <label>Estimated Time</label>
-          <input type="text" id="maintenanceTime" placeholder="30 minutes">
+          <label>Estimated Time (Minutes)</label>
+          <input type="number" id="maintenanceTime" placeholder="30">
         </div>
         <button class="btn btn-warning" onclick="saveMaintenance()"><i class="fas fa-save"></i> Update Maintenance</button>
       </div>
@@ -210,6 +216,7 @@
     let allUsers = [];
     let filteredUsers = [];
     let channelLinks = [];
+    let withdrawLevels = [];
 
     function toast(msg) {
       const t = document.getElementById('toast');
@@ -224,6 +231,65 @@
       document.getElementById('tab-' + id).classList.add('active');
       if(id === 'users') loadUsers();
       if(id === 'withdrawals') loadAllWithdrawals();
+    }
+
+    // ===================================================
+    // ✅ WITHDRAW LEVELS MANAGEMENT
+    // ===================================================
+    function renderWithdrawLevels() {
+      const container = document.getElementById('withdrawLevelsContainer');
+      if (!withdrawLevels.length) {
+        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px; font-size:0.85rem;">No levels configured. Add a level below.</p>';
+        return;
+      }
+      let html = '';
+      withdrawLevels.forEach((level, index) => {
+        html += `
+          <div style="background:#f9f9f9; padding:12px; border-radius:10px; border:1px solid #e1e1e1; margin-bottom:10px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <input type="number" value="${level.requiredRefs}" id="wl_refs_${index}" placeholder="Refs" style="width:70px; padding:6px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem;">
+              <input type="number" value="${level.fee}" id="wl_fee_${index}" placeholder="Fee %" style="width:70px; padding:6px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem;">
+              <input type="number" value="${level.minAmount}" id="wl_min_${index}" placeholder="Min" style="width:80px; padding:6px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem;">
+              <input type="number" value="${level.maxAmount}" id="wl_max_${index}" placeholder="Max" style="width:80px; padding:6px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem;">
+              <input type="text" value="${level.time}" id="wl_time_${index}" placeholder="Time" style="width:100px; padding:6px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem;">
+              <button class="btn btn-red btn-small" onclick="removeWithdrawLevel(${index})" style="width:auto; padding:6px 12px; font-size:0.8rem;"><i class="fas fa-trash"></i></button>
+            </div>
+            <div style="font-size:0.7rem; color:#888; margin-top:4px;">Refs | Fee % | Min | Max | Processing Time</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function addWithdrawLevel() {
+      withdrawLevels.push({
+        requiredRefs: 5,
+        fee: 5,
+        minAmount: 10,
+        maxAmount: 100,
+        time: "24-48 Hours"
+      });
+      renderWithdrawLevels();
+      toast('Level added! Save settings to apply.');
+    }
+
+    function removeWithdrawLevel(index) {
+      withdrawLevels.splice(index, 1);
+      renderWithdrawLevels();
+      toast('Level removed! Save settings to apply.');
+    }
+
+    function getWithdrawLevelsFromUI() {
+      const levels = [];
+      withdrawLevels.forEach((_, index) => {
+        const refs = parseInt(document.getElementById(`wl_refs_${index}`).value) || 5;
+        const fee = parseFloat(document.getElementById(`wl_fee_${index}`).value) || 5;
+        const minAmt = parseFloat(document.getElementById(`wl_min_${index}`).value) || 10;
+        const maxAmt = parseFloat(document.getElementById(`wl_max_${index}`).value) || 100;
+        const time = document.getElementById(`wl_time_${index}`).value || "24-48 Hours";
+        levels.push({ requiredRefs: refs, fee: fee, minAmount: minAmt, maxAmount: maxAmt, time: time });
+      });
+      return levels;
     }
 
     // ===================================================
@@ -280,6 +346,15 @@
         ];
         renderChannelLinks();
         
+        withdrawLevels = configData.withdrawLevels || [
+          { requiredRefs: 5, fee: 5, minAmount: 10, maxAmount: 100, time: "24-48 Hours" },
+          { requiredRefs: 7, fee: 4, minAmount: 10, maxAmount: 200, time: "24-48 Hours" },
+          { requiredRefs: 7, fee: 3, minAmount: 10, maxAmount: 300, time: "12-24 Hours" },
+          { requiredRefs: 7, fee: 2, minAmount: 10, maxAmount: 400, time: "12-24 Hours" },
+          { requiredRefs: 7, fee: 1, minAmount: 10, maxAmount: 500, time: "6-12 Hours" }
+        ];
+        renderWithdrawLevels();
+        
         document.getElementById('botUsername').value = configData.botUsername || '';
         document.getElementById('currencySymbol').value = configData.currencySymbol || 'TK';
         document.getElementById('dailyBonusAmount').value = configData.dailyBonusAmount || 20;
@@ -297,7 +372,7 @@
         if(configData.maintenance) {
           document.getElementById('maintenanceMode').value = configData.maintenance.active ? 'true' : 'false';
           document.getElementById('maintenanceMsg').value = configData.maintenance.message || '';
-          document.getElementById('maintenanceTime').value = configData.maintenance.estimatedTime || '';
+          document.getElementById('maintenanceTime').value = configData.maintenance.estimatedMinutes || '';
         }
 
         // Ads
@@ -338,7 +413,7 @@
     });
 
     // ===================================================
-    // ✅ SAVE SETTINGS (with channel links)
+    // ✅ SAVE SETTINGS (with channel links & withdraw levels)
     // ===================================================
     function saveSettings() {
       let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
@@ -353,6 +428,9 @@
         }
       });
       
+      // Get withdraw levels from UI
+      const levels = getWithdrawLevelsFromUI();
+      
       db.ref('config').update({
         botUsername: document.getElementById('botUsername').value,
         currencySymbol: document.getElementById('currencySymbol').value,
@@ -363,9 +441,11 @@
         minWithdraw: Number(document.getElementById('minWithdraw').value),
         withdrawNotice: document.getElementById('withdrawNotice').value,
         paymentMethods: methods,
-        channelLinks: newChannelLinks
+        channelLinks: newChannelLinks,
+        withdrawLevels: levels
       }).then(() => {
         channelLinks = newChannelLinks;
+        withdrawLevels = levels;
         toast('Settings Saved Successfully!');
       });
     }
@@ -423,7 +503,7 @@
       db.ref('config/maintenance').set({
         active: active,
         message: document.getElementById('maintenanceMsg').value,
-        estimatedTime: document.getElementById('maintenanceTime').value
+        estimatedMinutes: Number(document.getElementById('maintenanceTime').value) || 30
       }).then(() => toast('Maintenance settings updated!'));
     }
 
@@ -465,11 +545,12 @@
         const statusClass = isBanned ? 'banned' : 'active';
         const statusText = isBanned ? '🚫 Banned' : '✅ Active';
         const isVerified = u.channelVerified || false;
+        const wdCount = u.withdrawCount || 0;
         html += `
         <div class="user-card">
           <div class="user-info">
             <div class="name">${u.name || 'Unknown'} <span class="status-badge ${statusClass}">${statusText}</span></div>
-            <div class="id">ID: ${u.id} ${isVerified ? '✅ Verified' : '❌ Not Verified'}</div>
+            <div class="id">ID: ${u.id} ${isVerified ? '✅ Verified' : '❌ Not Verified'} | Withdraws: ${wdCount}</div>
             <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} | Referrals: ${u.referrals || 0}</div>
           </div>
           <div class="user-actions">
@@ -530,6 +611,8 @@
           let req = child.val();
           let key = child.key;
           let date = new Date(req.timestamp).toLocaleString();
+          const feeText = req.fee ? `Fee: ${req.fee.toFixed(2)}` : '';
+          const levelText = req.level ? `Level ${req.level}` : '';
           html += `
           <div class="wd-card">
             <div class="wd-head">
@@ -540,6 +623,7 @@
               <b>Account:</b> <span style="color:#d63031; font-weight:800; font-size:1.05rem;">${req.account}</span><br>
               <b>User ID:</b> ${req.userId}<br>
               <b>Name:</b> ${req.userName}<br>
+              <b>Level:</b> ${levelText} | ${feeText}<br>
               <small style="color:#999;">Date: ${date}</small>
             </div>
             <div class="wd-actions">
@@ -563,11 +647,13 @@
             let req = child.val();
             count++;
             const statusColor = req.status === 'approved' ? '#00b894' : req.status === 'pending' ? '#f39c12' : '#ff4757';
+            const feeText = req.fee ? `Fee: ${req.fee.toFixed(2)}` : '';
+            const levelText = req.level ? `L${req.level}` : '';
             html += `
             <div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
-              <span><b>${req.userName || 'User'}</b> (${req.userId})</span>
+              <span><b>${req.userName || 'User'}</b> (${req.userId}) ${levelText}</span>
               <span>${req.method} - ${req.account}</span>
-              <span style="font-weight:800; color:var(--primary);">${req.amount}</span>
+              <span style="font-weight:800; color:var(--primary);">${req.amount} ${feeText}</span>
               <span style="color:${statusColor}; font-weight:700; background:${statusColor}15; padding:2px 10px; border-radius:12px;">${req.status}</span>
             </div>`;
           });
