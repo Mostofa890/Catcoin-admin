@@ -69,6 +69,20 @@
     .channel-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
     .channel-item input { flex: 1; }
     .channel-item .btn-small { width: auto; padding: 10px 12px; }
+
+    /* Referral Level Badge in Admin */
+    .ref-level-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: 700;
+    }
+    .ref-level-badge.beginner { background: rgba(108,92,231,0.15); color: var(--primary); }
+    .ref-level-badge.bronze { background: rgba(205,127,50,0.2); color: #cd7f32; }
+    .ref-level-badge.silver { background: rgba(192,192,192,0.25); color: #7a7a7a; }
+    .ref-level-badge.gold { background: rgba(255,215,0,0.25); color: #b8860b; }
+    .ref-level-badge.platinum { background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(162,155,254,0.2)); color: var(--primary); }
   </style>
 </head>
 <body>
@@ -82,6 +96,7 @@
       <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-wallet"></i> Payouts</div>
       <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-ad"></i> Ads & Tasks</div>
       <div class="tab" onclick="switchTab('maintenance', this)"><i class="fas fa-tools"></i> Maintenance</div>
+      <div class="tab" onclick="switchTab('referrals', this)"><i class="fas fa-user-plus"></i> Referrals</div>
     </div>
 
     <!-- ================= SETTINGS TAB ================= -->
@@ -105,6 +120,18 @@
         <h3><i class="fas fa-gift"></i> Referral & Bonus</h3>
         <div class="form-group"><label>Daily Login Bonus (Amount)</label><input type="number" id="dailyBonusAmount" placeholder="20"></div>
         <div class="form-group"><label>Bonus Per Referral</label><input type="number" id="refBonus" placeholder="5"></div>
+        <div class="form-group"><label>Referral Levels (Auto-generated)</label>
+          <div style="background:#f9f9f9; padding:12px; border-radius:10px; font-size:0.85rem; color:#555; border:1px solid #eee;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; font-weight:700; border-bottom:1px solid #ddd; padding-bottom:5px; margin-bottom:5px;">
+              <span>Level</span><span>Min Refs</span><span>Badge</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>BEGINNER</span><span>0</span><span>⭐</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>BRONZE</span><span>5</span><span>🥉</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>SILVER</span><span>15</span><span>🥈</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>GOLD</span><span>30</span><span>🥇</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>PLATINUM</span><span>50</span><span>👑</span></div>
+          </div>
+        </div>
         <div class="form-group"><label>Tutorial Video Link (YouTube)</label><input type="text" id="tutorialLink" placeholder="https://youtube.com/..."></div>
         <div class="form-group"><label>Support Group/Channel Link</label><input type="text" id="supportLink" placeholder="https://t.me/your_group"></div>
       </div>
@@ -194,6 +221,23 @@
       </div>
     </div>
 
+    <!-- ================= REFERRALS TAB (NEW) ================= -->
+    <div id="tab-referrals" class="tab-content">
+      <div class="card">
+        <h3><i class="fas fa-trophy"></i> Top Referrers</h3>
+        <div id="adminRefLeaderboard">
+          <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-users"></i> All Referral Stats</h3>
+        <div id="adminRefStats">
+          <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="refreshReferralStats()"><i class="fas fa-sync"></i> Refresh Referral Stats</button>
+    </div>
+
   </div>
 
   <script>
@@ -218,6 +262,25 @@
     let channelLinks = [];
     let withdrawLevels = [];
 
+    // ===================================================
+    // ✅ REFERRAL LEVELS
+    // ===================================================
+    const REFERRAL_LEVELS = {
+      BEGINNER: { min: 0, label: '⭐ BEGINNER', class: 'beginner' },
+      BRONZE: { min: 5, label: '🥉 BRONZE', class: 'bronze' },
+      SILVER: { min: 15, label: '🥈 SILVER', class: 'silver' },
+      GOLD: { min: 30, label: '🥇 GOLD', class: 'gold' },
+      PLATINUM: { min: 50, label: '👑 PLATINUM', class: 'platinum' }
+    };
+
+    function getReferralLevel(refs) {
+      if (refs >= 50) return REFERRAL_LEVELS.PLATINUM;
+      if (refs >= 30) return REFERRAL_LEVELS.GOLD;
+      if (refs >= 15) return REFERRAL_LEVELS.SILVER;
+      if (refs >= 5) return REFERRAL_LEVELS.BRONZE;
+      return REFERRAL_LEVELS.BEGINNER;
+    }
+
     function toast(msg) {
       const t = document.getElementById('toast');
       t.innerText = msg; t.classList.add('show');
@@ -231,6 +294,7 @@
       document.getElementById('tab-' + id).classList.add('active');
       if(id === 'users') loadUsers();
       if(id === 'withdrawals') loadAllWithdrawals();
+      if(id === 'referrals') loadReferralStats();
     }
 
     // ===================================================
@@ -413,12 +477,11 @@
     });
 
     // ===================================================
-    // ✅ SAVE SETTINGS (with channel links & withdraw levels)
+    // ✅ SAVE SETTINGS
     // ===================================================
     function saveSettings() {
       let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
       
-      // Get current channel links from inputs
       const newChannelLinks = [];
       channelLinks.forEach((link, index) => {
         const label = document.getElementById(`channelLabel_${index}`);
@@ -428,7 +491,6 @@
         }
       });
       
-      // Get withdraw levels from UI
       const levels = getWithdrawLevelsFromUI();
       
       db.ref('config').update({
@@ -546,12 +608,14 @@
         const statusText = isBanned ? '🚫 Banned' : '✅ Active';
         const isVerified = u.channelVerified || false;
         const wdCount = u.withdrawCount || 0;
+        const refs = u.referrals || 0;
+        const level = getReferralLevel(refs);
         html += `
         <div class="user-card">
           <div class="user-info">
             <div class="name">${u.name || 'Unknown'} <span class="status-badge ${statusClass}">${statusText}</span></div>
             <div class="id">ID: ${u.id} ${isVerified ? '✅ Verified' : '❌ Not Verified'} | Withdraws: ${wdCount}</div>
-            <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} | Referrals: ${u.referrals || 0}</div>
+            <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} | Referrals: ${refs} <span class="ref-level-badge ${level.class}">${level.label}</span></div>
           </div>
           <div class="user-actions">
             <button class="btn btn-green btn-small" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>
@@ -687,6 +751,95 @@
         }
       }
     }
+
+    // ===================================================
+    // ✅ REFERRAL STATS (NEW)
+    // ===================================================
+    async function loadReferralStats() {
+      try {
+        const snap = await db.ref('users').once('value');
+        let users = [];
+        let totalRefs = 0;
+        let topReferrers = [];
+        
+        if(snap.exists()) {
+          snap.forEach(child => {
+            const u = child.val();
+            if (u.referrals && u.referrals > 0) {
+              users.push({
+                id: child.key,
+                name: u.name || 'User',
+                referrals: u.referrals || 0,
+                balance: u.balance || 0
+              });
+              totalRefs += u.referrals;
+            }
+          });
+        }
+        
+        // Sort by referrals
+        users.sort((a, b) => b.referrals - a.referrals);
+        topReferrers = users.slice(0, 10);
+        
+        // Render leaderboard
+        const leaderContainer = document.getElementById('adminRefLeaderboard');
+        if (topReferrers.length === 0) {
+          leaderContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No referrals yet.</p>';
+        } else {
+          let html = '';
+          const medals = ['🥇', '🥈', '🥉'];
+          topReferrers.forEach((u, i) => {
+            const medal = i < 3 ? medals[i] : `#${i+1}`;
+            const level = getReferralLevel(u.referrals);
+            html += `
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--bg); border-radius:12px; margin-bottom:8px; border:1px solid var(--border);">
+              <div style="font-weight:900; font-size:1.1rem; color:var(--primary); width:40px; text-align:center;">${medal}</div>
+              <div style="flex:1;">
+                <div style="font-weight:600; font-size:0.9rem;">${u.name}</div>
+                <div style="font-size:0.75rem; color:var(--text-light);">ID: ${u.id}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-weight:800; color:var(--primary);">${u.referrals} Refs</div>
+                <span class="ref-level-badge ${level.class}" style="font-size:0.6rem;">${level.label}</span>
+              </div>
+            </div>`;
+          });
+          leaderContainer.innerHTML = html;
+        }
+        
+        // Render stats
+        const statsContainer = document.getElementById('adminRefStats');
+        const totalUsers = snap.exists() ? snap.numChildren() : 0;
+        const avgRefs = totalUsers > 0 ? (totalRefs / totalUsers).toFixed(2) : 0;
+        statsContainer.innerHTML = `
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--primary);">${totalRefs}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Total Referrals</div>
+            </div>
+            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--success);">${users.length}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Users with Refs</div>
+            </div>
+            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--warning);">${avgRefs}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Avg Refs/User</div>
+            </div>
+          </div>
+          <div style="margin-top:12px; font-size:0.8rem; color:#888; text-align:center;">
+            Total Users: ${totalUsers} | Top Referrer: ${topReferrers.length > 0 ? topReferrers[0].name + ' (' + topReferrers[0].referrals + ')' : 'N/A'}
+          </div>
+        `;
+      } catch(e) {
+        console.error('Error loading referral stats:', e);
+      }
+    }
+
+    function refreshReferralStats() {
+      toast('Refreshing referral stats...');
+      loadReferralStats();
+    }
+
   </script>
 </body>
 </html>
