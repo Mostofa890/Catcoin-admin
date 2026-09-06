@@ -65,6 +65,10 @@
     .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
     .search-box input { flex: 1; }
     .search-box button { width: auto; padding: 14px 20px; }
+
+    .channel-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .channel-item input { flex: 1; }
+    .channel-item .btn-small { width: auto; padding: 10px 12px; }
   </style>
 </head>
 <body>
@@ -86,8 +90,15 @@
         <h3><i class="fas fa-robot"></i> App Details</h3>
         <div class="form-group"><label>Bot Username (Without @)</label><input type="text" id="botUsername" placeholder="your_bot"></div>
         <div class="form-group"><label>Currency Symbol</label><input type="text" id="currencySymbol" placeholder="TK"></div>
-        <div class="form-group"><label>Channel Links (JSON Array)</label>
-          <textarea id="channelLinks" rows="3" placeholder='[{"label":"Channel 1","chatId":"channel1"},{"label":"Channel 2","chatId":"channel2"}]'></textarea>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-link"></i> Channel Links for Verification</h3>
+        <p style="font-size:0.8rem; color:#888; margin-bottom:12px;">Users must join all channels to access the app. Add or remove channels below.</p>
+        <div id="channelLinksContainer"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <input type="text" id="newChannelLabel" placeholder="Channel Name" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
+          <input type="text" id="newChannelId" placeholder="Chat ID/Username" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
+          <button class="btn btn-green btn-small" onclick="addChannelLink()"><i class="fas fa-plus"></i> Add</button>
         </div>
       </div>
       <div class="card">
@@ -198,6 +209,7 @@
     let configData = { adSlots:[], webTasks:{} };
     let allUsers = [];
     let filteredUsers = [];
+    let channelLinks = [];
 
     function toast(msg) {
       const t = document.getElementById('toast');
@@ -215,6 +227,45 @@
     }
 
     // ===================================================
+    // ✅ CHANNEL LINKS MANAGEMENT
+    // ===================================================
+    function renderChannelLinks() {
+      const container = document.getElementById('channelLinksContainer');
+      if (!channelLinks.length) {
+        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px;">No channels added yet.</p>';
+        return;
+      }
+      let html = '';
+      channelLinks.forEach((link, index) => {
+        html += `
+          <div class="channel-item">
+            <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
+            <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
+            <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function addChannelLink() {
+      const label = document.getElementById('newChannelLabel').value.trim();
+      const chatId = document.getElementById('newChannelId').value.trim();
+      if (!label || !chatId) return toast('Please enter both label and chat ID');
+      channelLinks.push({ label, chatId });
+      renderChannelLinks();
+      document.getElementById('newChannelLabel').value = '';
+      document.getElementById('newChannelId').value = '';
+      toast('Channel added! Save settings to apply.');
+    }
+
+    function removeChannelLink(index) {
+      channelLinks.splice(index, 1);
+      renderChannelLinks();
+      toast('Channel removed! Save settings to apply.');
+    }
+
+    // ===================================================
     // ✅ READ CONFIG
     // ===================================================
     db.ref('config').on('value', snap => {
@@ -222,6 +273,12 @@
         configData = snap.val();
         if(!configData.adSlots) configData.adSlots = [{},{},{},{}];
         if(!configData.webTasks) configData.webTasks = {};
+        
+        channelLinks = configData.channelLinks || [
+          {label:'NexEarn Channel', chatId:'nexearn2'},
+          {label:'NexEarn Adda', chatId:'nexearn2_adda'}
+        ];
+        renderChannelLinks();
         
         document.getElementById('botUsername').value = configData.botUsername || '';
         document.getElementById('currencySymbol').value = configData.currencySymbol || 'TK';
@@ -232,10 +289,6 @@
         document.getElementById('minWithdraw').value = configData.minWithdraw || 10;
         document.getElementById('withdrawNotice').value = configData.withdrawNotice || '';
         document.getElementById('paymentMethods').value = configData.paymentMethods ? configData.paymentMethods.join(', ') : 'Bkash, Nagad';
-        document.getElementById('channelLinks').value = JSON.stringify(configData.channelLinks || [
-          {label:'NexEarn Channel', chatId:'nexearn2'},
-          {label:'NexEarn Adda', chatId:'nexearn2_adda'}
-        ], null, 2);
         
         document.getElementById('dailyAdLimit').value = configData.dailyAdLimit || 10;
         document.getElementById('adReward').value = configData.adReward || 0.5;
@@ -285,17 +338,21 @@
     });
 
     // ===================================================
-    // ✅ SAVE SETTINGS
+    // ✅ SAVE SETTINGS (with channel links)
     // ===================================================
     function saveSettings() {
       let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
-      let channelLinks = [];
-      try {
-        channelLinks = JSON.parse(document.getElementById('channelLinks').value);
-      } catch(e) {
-        toast('Invalid JSON for channel links!');
-        return;
-      }
+      
+      // Get current channel links from inputs
+      const newChannelLinks = [];
+      channelLinks.forEach((link, index) => {
+        const label = document.getElementById(`channelLabel_${index}`);
+        const chatId = document.getElementById(`channelId_${index}`);
+        if (label && chatId) {
+          newChannelLinks.push({ label: label.value, chatId: chatId.value });
+        }
+      });
+      
       db.ref('config').update({
         botUsername: document.getElementById('botUsername').value,
         currencySymbol: document.getElementById('currencySymbol').value,
@@ -306,8 +363,11 @@
         minWithdraw: Number(document.getElementById('minWithdraw').value),
         withdrawNotice: document.getElementById('withdrawNotice').value,
         paymentMethods: methods,
-        channelLinks: channelLinks
-      }).then(() => toast('General Settings Saved!'));
+        channelLinks: newChannelLinks
+      }).then(() => {
+        channelLinks = newChannelLinks;
+        toast('Settings Saved Successfully!');
+      });
     }
 
     // ===================================================
@@ -404,11 +464,12 @@
         const isBanned = u.isBanned || false;
         const statusClass = isBanned ? 'banned' : 'active';
         const statusText = isBanned ? '🚫 Banned' : '✅ Active';
+        const isVerified = u.channelVerified || false;
         html += `
         <div class="user-card">
           <div class="user-info">
             <div class="name">${u.name || 'Unknown'} <span class="status-badge ${statusClass}">${statusText}</span></div>
-            <div class="id">ID: ${u.id}</div>
+            <div class="id">ID: ${u.id} ${isVerified ? '✅ Verified' : '❌ Not Verified'}</div>
             <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} | Referrals: ${u.referrals || 0}</div>
           </div>
           <div class="user-actions">
