@@ -12,7 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
   <style>
-    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; }
+    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { background: var(--bg); color: var(--text); padding-bottom: 30px; }
     
@@ -20,7 +20,7 @@
     .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
     
     .tabs { display: flex; overflow-x: auto; background: var(--surface); border-radius: 15px; padding: 5px; gap: 5px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-    .tab { flex: 1; text-align: center; padding: 12px 10px; font-weight: 700; color: #888; cursor: pointer; border-radius: 10px; white-space: nowrap; transition: 0.3s; font-size: 0.9rem;}
+    .tab { flex: 1; text-align: center; padding: 12px 10px; font-weight: 700; color: #888; cursor: pointer; border-radius: 10px; white-space: nowrap; transition: 0.3s; font-size: 0.8rem;}
     .tab.active { background: rgba(108,92,231,0.1); color: var(--primary); }
 
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
@@ -39,15 +39,32 @@
     .btn:active { transform: scale(0.97); }
     .btn-green { background: linear-gradient(135deg, #00b894, #00cec9); }
     .btn-red { background: linear-gradient(135deg, #ff4757, #ff6b81); }
+    .btn-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
     .btn-small { width: auto; padding: 10px 15px; font-size: 0.85rem; border-radius: 8px;}
     
     .wd-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
     .wd-head { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 12px; border-bottom: 1px dashed #ddd; padding-bottom: 12px;}
     .wd-info { font-size: 0.9rem; color: #555; margin-bottom: 15px; line-height: 1.6; }
-    .wd-actions { display: flex; gap: 10px; }
+    .wd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    
+    .user-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .user-info { flex: 1; min-width: 150px; }
+    .user-info .name { font-weight: 700; font-size: 1rem; }
+    .user-info .id { font-size: 0.8rem; color: #999; }
+    .user-info .bal { font-weight: 800; color: var(--primary); }
+    .user-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     
     .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #2d3436; color: #fff; padding: 12px 25px; border-radius: 30px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; font-weight: 600;}
     .toast.show { opacity: 1; top: 30px; }
+
+    .status-badge { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+    .status-badge.active { background: rgba(0,184,148,0.15); color: var(--success); }
+    .status-badge.banned { background: rgba(255,71,87,0.15); color: var(--danger); }
+    .status-badge.maintenance { background: rgba(243,156,18,0.15); color: var(--warning); }
+
+    .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
+    .search-box input { flex: 1; }
+    .search-box button { width: auto; padding: 14px 20px; }
   </style>
 </head>
 <body>
@@ -57,8 +74,10 @@
   <div class="container">
     <div class="tabs">
       <div class="tab active" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> General</div>
+      <div class="tab" onclick="switchTab('users', this)"><i class="fas fa-users"></i> Users</div>
       <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-wallet"></i> Payouts</div>
       <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-ad"></i> Ads & Tasks</div>
+      <div class="tab" onclick="switchTab('maintenance', this)"><i class="fas fa-tools"></i> Maintenance</div>
     </div>
 
     <!-- ================= SETTINGS TAB ================= -->
@@ -67,6 +86,9 @@
         <h3><i class="fas fa-robot"></i> App Details</h3>
         <div class="form-group"><label>Bot Username (Without @)</label><input type="text" id="botUsername" placeholder="your_bot"></div>
         <div class="form-group"><label>Currency Symbol</label><input type="text" id="currencySymbol" placeholder="TK"></div>
+        <div class="form-group"><label>Channel Links (JSON Array)</label>
+          <textarea id="channelLinks" rows="3" placeholder='[{"label":"Channel 1","chatId":"channel1"},{"label":"Channel 2","chatId":"channel2"}]'></textarea>
+        </div>
       </div>
       <div class="card">
         <h3><i class="fas fa-gift"></i> Referral & Bonus</h3>
@@ -84,11 +106,27 @@
       <button class="btn" onclick="saveSettings()"><i class="fas fa-save"></i> Save General Settings</button>
     </div>
 
+    <!-- ================= USERS TAB ================= -->
+    <div id="tab-users" class="tab-content">
+      <div class="card">
+        <h3><i class="fas fa-users"></i> All Users</h3>
+        <div class="search-box">
+          <input type="text" id="userSearch" placeholder="Search by ID or Name..." oninput="filterUsers()">
+          <button class="btn btn-small" onclick="refreshUsers()"><i class="fas fa-sync"></i></button>
+        </div>
+        <div id="usersContainer">Loading users...</div>
+      </div>
+    </div>
+
     <!-- ================= WITHDRAWALS TAB ================= -->
     <div id="tab-withdrawals" class="tab-content">
       <div class="card">
         <h3><i class="fas fa-hourglass-half"></i> Pending Requests</h3>
         <div id="wd-container">Loading requests...</div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-history"></i> All Withdrawals</h3>
+        <div id="allWdContainer">Loading...</div>
       </div>
     </div>
 
@@ -116,11 +154,34 @@
       </div>
     </div>
 
+    <!-- ================= MAINTENANCE TAB ================= -->
+    <div id="tab-maintenance" class="tab-content">
+      <div class="card">
+        <h3><i class="fas fa-tools"></i> System Maintenance</h3>
+        <div class="form-group">
+          <label>Maintenance Mode</label>
+          <select id="maintenanceMode">
+            <option value="false">🟢 Online</option>
+            <option value="true">🔴 Maintenance Mode</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Maintenance Message</label>
+          <input type="text" id="maintenanceMsg" placeholder="We're updating our system...">
+        </div>
+        <div class="form-group">
+          <label>Estimated Time</label>
+          <input type="text" id="maintenanceTime" placeholder="30 minutes">
+        </div>
+        <button class="btn btn-warning" onclick="saveMaintenance()"><i class="fas fa-save"></i> Update Maintenance</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
     // ===================================================
-    // ✅ FIREBASE CONFIG (Replaced with your provided config)
+    // ✅ FIREBASE CONFIG
     // ===================================================
     const firebaseConfig = {
       apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
@@ -135,6 +196,8 @@
     const db = firebase.database();
     
     let configData = { adSlots:[], webTasks:{} };
+    let allUsers = [];
+    let filteredUsers = [];
 
     function toast(msg) {
       const t = document.getElementById('toast');
@@ -147,16 +210,19 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
       document.getElementById('tab-' + id).classList.add('active');
+      if(id === 'users') loadUsers();
+      if(id === 'withdrawals') loadAllWithdrawals();
     }
 
-    // Read Admin Config Realtime
+    // ===================================================
+    // ✅ READ CONFIG
+    // ===================================================
     db.ref('config').on('value', snap => {
       if(snap.exists()) {
         configData = snap.val();
         if(!configData.adSlots) configData.adSlots = [{},{},{},{}];
         if(!configData.webTasks) configData.webTasks = {};
         
-        // Populate Inputs
         document.getElementById('botUsername').value = configData.botUsername || '';
         document.getElementById('currencySymbol').value = configData.currencySymbol || 'TK';
         document.getElementById('dailyBonusAmount').value = configData.dailyBonusAmount || 20;
@@ -166,11 +232,22 @@
         document.getElementById('minWithdraw').value = configData.minWithdraw || 10;
         document.getElementById('withdrawNotice').value = configData.withdrawNotice || '';
         document.getElementById('paymentMethods').value = configData.paymentMethods ? configData.paymentMethods.join(', ') : 'Bkash, Nagad';
+        document.getElementById('channelLinks').value = JSON.stringify(configData.channelLinks || [
+          {label:'NexEarn Channel', chatId:'nexearn2'},
+          {label:'NexEarn Adda', chatId:'nexearn2_adda'}
+        ], null, 2);
         
         document.getElementById('dailyAdLimit').value = configData.dailyAdLimit || 10;
         document.getElementById('adReward').value = configData.adReward || 0.5;
 
-        // Populate Ads Slots
+        // Maintenance
+        if(configData.maintenance) {
+          document.getElementById('maintenanceMode').value = configData.maintenance.active ? 'true' : 'false';
+          document.getElementById('maintenanceMsg').value = configData.maintenance.message || '';
+          document.getElementById('maintenanceTime').value = configData.maintenance.estimatedTime || '';
+        }
+
+        // Ads
         let adHtml = '';
         for(let i=0; i<4; i++) {
           let slot = configData.adSlots[i] || { network: 'none', id: '' };
@@ -188,11 +265,10 @@
         }
         document.getElementById('adsContainer').innerHTML = adHtml;
 
-        // Populate Tasks List
+        // Tasks
         let taskHtml = '';
         const tasks = configData.webTasks;
         if(Object.keys(tasks).length === 0) taskHtml = '<p style="font-size:0.9rem; color:#777; text-align:center;">No tasks found.</p>';
-        
         Object.keys(tasks).forEach(k => {
           let t = tasks[k];
           taskHtml += `
@@ -208,9 +284,18 @@
       }
     });
 
-    // Save General Settings
+    // ===================================================
+    // ✅ SAVE SETTINGS
+    // ===================================================
     function saveSettings() {
       let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
+      let channelLinks = [];
+      try {
+        channelLinks = JSON.parse(document.getElementById('channelLinks').value);
+      } catch(e) {
+        toast('Invalid JSON for channel links!');
+        return;
+      }
       db.ref('config').update({
         botUsername: document.getElementById('botUsername').value,
         currencySymbol: document.getElementById('currencySymbol').value,
@@ -220,11 +305,14 @@
         supportLink: document.getElementById('supportLink').value,
         minWithdraw: Number(document.getElementById('minWithdraw').value),
         withdrawNotice: document.getElementById('withdrawNotice').value,
-        paymentMethods: methods
+        paymentMethods: methods,
+        channelLinks: channelLinks
       }).then(() => toast('General Settings Saved!'));
     }
 
-    // Save Ads Settings
+    // ===================================================
+    // ✅ SAVE ADS
+    // ===================================================
     function saveAds() {
       let slots = [];
       for(let i=0; i<4; i++) {
@@ -240,7 +328,9 @@
       }).then(() => toast('Ad Settings Saved!'));
     }
 
-    // Add New Task
+    // ===================================================
+    // ✅ TASKS
+    // ===================================================
     function addTask() {
       let id = 'task_' + Date.now();
       let data = {
@@ -259,14 +349,119 @@
       });
     }
 
-    // Delete Task
     function deleteTask(id) { 
       if(confirm('Are you sure you want to delete this task?')) {
         db.ref('config/webTasks/' + id).remove().then(() => toast('Task Deleted!'));
       }
     }
 
-    // Fetch Pending Withdrawals
+    // ===================================================
+    // ✅ MAINTENANCE
+    // ===================================================
+    function saveMaintenance() {
+      const active = document.getElementById('maintenanceMode').value === 'true';
+      db.ref('config/maintenance').set({
+        active: active,
+        message: document.getElementById('maintenanceMsg').value,
+        estimatedTime: document.getElementById('maintenanceTime').value
+      }).then(() => toast('Maintenance settings updated!'));
+    }
+
+    // ===================================================
+    // ✅ USERS MANAGEMENT
+    // ===================================================
+    function loadUsers() {
+      db.ref('users').once('value', snap => {
+        allUsers = [];
+        if(snap.exists()) {
+          snap.forEach(child => {
+            let u = child.val();
+            u.id = child.key;
+            allUsers.push(u);
+          });
+        }
+        filterUsers();
+      });
+    }
+
+    function filterUsers() {
+      const search = document.getElementById('userSearch').value.toLowerCase();
+      filteredUsers = allUsers.filter(u => 
+        (u.id && u.id.toString().includes(search)) || 
+        (u.name && u.name.toLowerCase().includes(search))
+      );
+      renderUsers();
+    }
+
+    function renderUsers() {
+      const container = document.getElementById('usersContainer');
+      if(filteredUsers.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No users found.</p>';
+        return;
+      }
+      let html = '';
+      filteredUsers.forEach(u => {
+        const isBanned = u.isBanned || false;
+        const statusClass = isBanned ? 'banned' : 'active';
+        const statusText = isBanned ? '🚫 Banned' : '✅ Active';
+        html += `
+        <div class="user-card">
+          <div class="user-info">
+            <div class="name">${u.name || 'Unknown'} <span class="status-badge ${statusClass}">${statusText}</span></div>
+            <div class="id">ID: ${u.id}</div>
+            <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} | Referrals: ${u.referrals || 0}</div>
+          </div>
+          <div class="user-actions">
+            <button class="btn btn-green btn-small" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>
+            <button class="btn ${isBanned ? 'btn-green' : 'btn-warning'} btn-small" onclick="toggleBan('${u.id}', ${!isBanned})">
+              <i class="fas ${isBanned ? 'fa-check' : 'fa-ban'}"></i> ${isBanned ? 'Unban' : 'Ban'}
+            </button>
+            <button class="btn btn-red btn-small" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function refreshUsers() {
+      loadUsers();
+      toast('Users refreshed!');
+    }
+
+    function editUser(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if(!user) return;
+      const newBal = prompt(`Enter new balance for ${user.name || userId}:`, user.balance || 0);
+      if(newBal !== null && !isNaN(newBal)) {
+        db.ref('users/' + userId + '/balance').set(Number(newBal)).then(() => {
+          toast('Balance updated!');
+          loadUsers();
+        });
+      }
+    }
+
+    function toggleBan(userId, ban) {
+      const action = ban ? 'ban' : 'unban';
+      if(confirm(`Are you sure you want to ${action} this user?`)) {
+        db.ref('users/' + userId).update({ isBanned: ban }).then(() => {
+          toast(`User ${action}ned!`);
+          loadUsers();
+        });
+      }
+    }
+
+    function deleteUser(userId) {
+      if(confirm('⚠️ Are you sure you want to DELETE this user and all their data? This cannot be undone!')) {
+        db.ref('users/' + userId).remove().then(() => {
+          toast('User deleted!');
+          loadUsers();
+        });
+      }
+    }
+
+    // ===================================================
+    // ✅ WITHDRAWALS
+    // ===================================================
     db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', snap => {
       let html = '';
       if(snap.exists()) {
@@ -274,7 +469,6 @@
           let req = child.val();
           let key = child.key;
           let date = new Date(req.timestamp).toLocaleString();
-          
           html += `
           <div class="wd-card">
             <div class="wd-head">
@@ -294,30 +488,55 @@
           </div>`;
         });
       } else { 
-        html = '<div style="text-align:center; padding:30px 10px; color:#888;"><i class="fas fa-check-circle" style="font-size:3rem; margin-bottom:15px; color:#00b894; opacity:0.8;"></i><br><b style="font-size:1.1rem; color:#444;">No Pending Requests!</b><br>Everything is clear.</div>'; 
+        html = '<div style="text-align:center; padding:30px 10px; color:#888;"><i class="fas fa-check-circle" style="font-size:3rem; margin-bottom:15px; color:#00b894; opacity:0.8;"></i><br><b style="font-size:1.1rem; color:#444;">No Pending Requests!</b></div>'; 
       }
       document.getElementById('wd-container').innerHTML = html;
     });
 
+    function loadAllWithdrawals() {
+      db.ref('withdrawals').once('value', snap => {
+        let html = '';
+        if(snap.exists()) {
+          let count = 0;
+          snap.forEach(child => {
+            let req = child.val();
+            count++;
+            const statusColor = req.status === 'approved' ? '#00b894' : req.status === 'pending' ? '#f39c12' : '#ff4757';
+            html += `
+            <div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
+              <span><b>${req.userName || 'User'}</b> (${req.userId})</span>
+              <span>${req.method} - ${req.account}</span>
+              <span style="font-weight:800; color:var(--primary);">${req.amount}</span>
+              <span style="color:${statusColor}; font-weight:700; background:${statusColor}15; padding:2px 10px; border-radius:12px;">${req.status}</span>
+            </div>`;
+          });
+          if(count === 0) html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>';
+        } else {
+          html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>';
+        }
+        document.getElementById('allWdContainer').innerHTML = html;
+      });
+    }
+
     function approveWd(id) {
-      if(confirm('Are you sure you want to approve this payment?')) {
+      if(confirm('Approve this payment?')) {
         db.ref('withdrawals/' + id).update({ status: 'approved' }).then(() => toast('Payment Approved!'));
       }
     }
 
     async function rejectWd(id, userId, amount) {
-      if(confirm('Reject this request and refund the balance to the user?')) {
+      if(confirm('Reject and refund balance?')) {
         try {
           const userRef = db.ref('users/' + userId);
           const snap = await userRef.once('value');
           if(snap.exists()){
             let bal = Number(snap.val().balance || 0);
-            await userRef.update({ balance: bal + Number(amount) }); // Refund
+            await userRef.update({ balance: bal + Number(amount) });
           }
           await db.ref('withdrawals/' + id).update({ status: 'rejected' });
-          toast('Rejected & Balance Refunded!');
+          toast('Rejected & Refunded!');
         } catch(e) {
-          toast('Error while rejecting!');
+          toast('Error!');
         }
       }
     }
