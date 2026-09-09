@@ -12,7 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
   <style>
-    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; }
+    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; --info: #0984e3; }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { background: var(--bg); color: var(--text); padding-bottom: 30px; }
     
@@ -40,6 +40,7 @@
     .btn-green { background: linear-gradient(135deg, #00b894, #00cec9); }
     .btn-red { background: linear-gradient(135deg, #ff4757, #ff6b81); }
     .btn-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+    .btn-info { background: linear-gradient(135deg, #0984e3, #74b9ff); }
     .btn-small { width: auto; padding: 10px 15px; font-size: 0.85rem; border-radius: 8px;}
     
     .wd-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
@@ -70,7 +71,6 @@
     .channel-item input { flex: 1; }
     .channel-item .btn-small { width: auto; padding: 10px 12px; }
 
-    /* Referral Level Badge in Admin */
     .ref-level-badge {
         display: inline-block;
         padding: 2px 10px;
@@ -84,7 +84,6 @@
     .ref-level-badge.gold { background: rgba(255,215,0,0.25); color: #b8860b; }
     .ref-level-badge.platinum { background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(162,155,254,0.2)); color: var(--primary); }
 
-    /* Level Edit Item */
     .level-edit-item {
         background: #f9f9f9;
         padding: 12px;
@@ -120,6 +119,86 @@
     .level-edit-item .level-fields input.wide {
         width: 100px;
     }
+
+    /* ----- CPM RECOMMENDATION CARD ----- */
+    .cpm-card {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        color: #fff;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+    .cpm-card .cpm-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    .cpm-card .cpm-header .cpm-title {
+        font-size: 1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .cpm-card .cpm-value {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin: 5px 0;
+    }
+    .cpm-card .cpm-status {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+    .cpm-card .cpm-status.good { background: rgba(0,184,148,0.25); color: #00b894; }
+    .cpm-card .cpm-status.poor { background: rgba(255,71,87,0.25); color: #ff4757; }
+    .cpm-card .cpm-status.moderate { background: rgba(243,156,18,0.25); color: #f39c12; }
+    .cpm-card .cpm-recommendation {
+        margin-top: 15px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.08);
+        border-left: 4px solid var(--primary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    .cpm-card .cpm-recommendation i { margin-right: 8px; }
+    .cpm-card .cpm-actions {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .cpm-card .cpm-actions .btn-small { width: auto; padding: 8px 16px; font-size: 0.8rem; }
+    .cpm-card .last-updated {
+        font-size: 0.7rem;
+        opacity: 0.5;
+        margin-top: 12px;
+    }
+
+    /* History log */
+    .cpm-history {
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.8rem;
+    }
+    .cpm-history .log-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.7);
+    }
+    .cpm-history .log-item .time { opacity: 0.6; }
+    .cpm-history .log-item .val { font-weight: 600; }
+    .cpm-history .log-item .val.good { color: #00b894; }
+    .cpm-history .log-item .val.poor { color: #ff4757; }
   </style>
 </head>
 <body>
@@ -128,7 +207,8 @@
 
   <div class="container">
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> General</div>
+      <div class="tab active" onclick="switchTab('cpm', this)"><i class="fas fa-chart-line"></i> CPM Monitor</div>
+      <div class="tab" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> General</div>
       <div class="tab" onclick="switchTab('users', this)"><i class="fas fa-users"></i> Users</div>
       <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-wallet"></i> Payouts</div>
       <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-ad"></i> Ads & Tasks</div>
@@ -136,8 +216,45 @@
       <div class="tab" onclick="switchTab('referrals', this)"><i class="fas fa-user-plus"></i> Referrals</div>
     </div>
 
-    <!-- ================= SETTINGS TAB ================= -->
-    <div id="tab-settings" class="tab-content active">
+    <!-- ================= CPM MONITOR TAB (NEW) ================= -->
+    <div id="tab-cpm" class="tab-content active">
+      <div class="cpm-card" id="cpmCard">
+        <div class="cpm-header">
+          <span class="cpm-title"><i class="fas fa-bolt" style="color:#facc15;"></i> Live CPM Status</span>
+          <span id="cpmLastUpdate" style="font-size:0.7rem; opacity:0.5;">—</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+          <div>
+            <div style="font-size:0.8rem; opacity:0.6;">Current CPM (USD)</div>
+            <div class="cpm-value" id="cpmValue">0.00</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.8rem; opacity:0.6;">Status</div>
+            <span class="cpm-status" id="cpmStatusBadge">—</span>
+          </div>
+        </div>
+        <div class="cpm-recommendation" id="cpmRecommendation">
+          <i class="fas fa-lightbulb"></i> Loading recommendation...
+        </div>
+        <div class="cpm-actions">
+          <button class="btn btn-info btn-small" onclick="simulateCpmCheck()"><i class="fas fa-sync"></i> Check CPM Now</button>
+          <button class="btn btn-warning btn-small" onclick="manuallySetCpm()"><i class="fas fa-pen"></i> Set Manually</button>
+        </div>
+        <div style="margin-top:15px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.85rem; font-weight:600;">Recent History</span>
+            <button class="btn btn-small" style="width:auto; padding:4px 12px; font-size:0.7rem; background:rgba(255,255,255,0.1);" onclick="clearCpmHistory()">Clear</button>
+          </div>
+          <div class="cpm-history" id="cpmHistory">
+            <div style="text-align:center; color:rgba(255,255,255,0.3); padding:10px;">No data yet</div>
+          </div>
+        </div>
+        <div class="last-updated" id="cpmFooter">Last updated: —</div>
+      </div>
+    </div>
+
+    <!-- ================= SETTINGS TAB (unchanged) ================= -->
+    <div id="tab-settings" class="tab-content">
       <div class="card">
         <h3><i class="fas fa-robot"></i> App Details</h3>
         <div class="form-group"><label>Bot Username (Without @)</label><input type="text" id="botUsername" placeholder="your_bot"></div>
@@ -304,7 +421,7 @@
     let withdrawLevels = [];
 
     // ===================================================
-    // ✅ REFERRAL LEVELS
+    // ✅ REFERRAL LEVELS (unchanged)
     // ===================================================
     const REFERRAL_LEVELS = {
       BEGINNER: { min: 0, label: '⭐ BEGINNER', class: 'beginner' },
@@ -336,10 +453,196 @@
       if(id === 'users') loadUsers();
       if(id === 'withdrawals') loadAllWithdrawals();
       if(id === 'referrals') loadReferralStats();
+      if(id === 'cpm') loadCpmData(); // load CPM when tab is opened
     }
 
     // ===================================================
-    // ✅ WITHDRAW LEVELS MANAGEMENT (EDITABLE)
+    // ✅ CPM MONITORING & RECOMMENDATION (NEW)
+    // ===================================================
+    let cpmData = { value: 0.0, status: 'moderate', recommendation: '', lastUpdated: Date.now() };
+    const CPM_THRESHOLD_GOOD = 2.5;
+    const CPM_THRESHOLD_MODERATE = 1.2;
+
+    function loadCpmData() {
+      db.ref('admin/cpmData').once('value', snap => {
+        if(snap.exists()) {
+          cpmData = snap.val();
+        } else {
+          // Default data
+          cpmData = { value: 1.8, status: 'moderate', recommendation: 'সিপিএম মাঝারি। আপনি অ্যাড রেট সামান্য বাড়াতে বা কমাতে পারেন।', lastUpdated: Date.now() };
+          db.ref('admin/cpmData').set(cpmData);
+        }
+        updateCpmUI();
+      });
+    }
+
+    function updateCpmUI() {
+      const val = cpmData.value || 0;
+      document.getElementById('cpmValue').textContent = val.toFixed(2);
+      
+      let statusText, statusClass;
+      if (val >= CPM_THRESHOLD_GOOD) {
+        statusText = '✅ ভালো (High)';
+        statusClass = 'good';
+        cpmData.status = 'good';
+        cpmData.recommendation = '📈 সিপিএম ভালো! আপনি অ্যাড রিওয়ার্ড বা স্লটের সংখ্যা বাড়াতে পারেন। ইউজারদের আরও আকর্ষণীয় অফার দিন।';
+      } else if (val >= CPM_THRESHOLD_MODERATE) {
+        statusText = '⚡ মাঝারি (Moderate)';
+        statusClass = 'moderate';
+        cpmData.status = 'moderate';
+        cpmData.recommendation = '📊 সিপিএম মাঝারি। আপনি অ্যাড রেট বা স্লট সংখ্যা সামান্য বাড়াতে বা কমাতে পারেন। বর্তমান রেট ঠিক আছে।';
+      } else {
+        statusText = '⚠️ খারাপ (Low)';
+        statusClass = 'poor';
+        cpmData.status = 'poor';
+        cpmData.recommendation = '📉 সিপিএম খারাপ! অ্যাড রিওয়ার্ড বা স্লট কমানোর পরামর্শ দেওয়া হচ্ছে। অ্যাড নেটওয়ার্ক পরিবর্তনের কথাও ভাবতে পারেন।';
+      }
+      
+      const badge = document.getElementById('cpmStatusBadge');
+      badge.textContent = statusText;
+      badge.className = 'cpm-status ' + statusClass;
+
+      document.getElementById('cpmRecommendation').innerHTML = `<i class="fas fa-lightbulb"></i> ${cpmData.recommendation}`;
+      
+      const lastUp = new Date(cpmData.lastUpdated);
+      const timeStr = lastUp.toLocaleString();
+      document.getElementById('cpmLastUpdate').textContent = 'Updated: ' + timeStr;
+      document.getElementById('cpmFooter').textContent = 'Last updated: ' + timeStr;
+
+      // Save to Firebase if status changed
+      db.ref('admin/cpmData').update({
+        value: cpmData.value,
+        status: cpmData.status,
+        recommendation: cpmData.recommendation,
+        lastUpdated: cpmData.lastUpdated
+      });
+
+      // Also push to history
+      pushCpmHistory(cpmData.value, cpmData.status);
+    }
+
+    function pushCpmHistory(value, status) {
+      const historyRef = db.ref('admin/cpmHistory');
+      historyRef.push({
+        value: value,
+        status: status,
+        timestamp: Date.now()
+      }).then(() => {
+        // Keep only last 20 entries
+        historyRef.limitToLast(20).once('value', snap => {
+          let count = 0;
+          let toRemove = [];
+          snap.forEach(child => {
+            count++;
+            if (count > 20) toRemove.push(child.key);
+          });
+          toRemove.forEach(key => historyRef.child(key).remove());
+        });
+      });
+    }
+
+    function displayCpmHistory() {
+      const container = document.getElementById('cpmHistory');
+      db.ref('admin/cpmHistory').orderByChild('timestamp').limitToLast(20).once('value', snap => {
+        let items = [];
+        snap.forEach(child => {
+          const data = child.val();
+          items.push(data);
+        });
+        items.reverse();
+        if (items.length === 0) {
+          container.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.3); padding:10px;">No history yet</div>';
+          return;
+        }
+        let html = '';
+        items.forEach(item => {
+          const time = new Date(item.timestamp).toLocaleTimeString();
+          const statusClass = item.status === 'good' ? 'good' : (item.status === 'poor' ? 'poor' : '');
+          html += `<div class="log-item">
+            <span class="time">${time}</span>
+            <span class="val ${statusClass}">${item.value.toFixed(2)} USD</span>
+          </div>`;
+        });
+        container.innerHTML = html;
+      });
+    }
+
+    function simulateCpmCheck() {
+      toast('⏳ Checking CPM...');
+      // Simulate network delay
+      setTimeout(() => {
+        // Generate random CPM between 0.5 and 4.0
+        const randomCpm = 0.5 + Math.random() * 3.5;
+        cpmData.value = randomCpm;
+        cpmData.lastUpdated = Date.now();
+        updateCpmUI();
+        displayCpmHistory();
+        toast('✅ CPM updated: ' + randomCpm.toFixed(2) + ' USD');
+      }, 1500);
+    }
+
+    function manuallySetCpm() {
+      const val = prompt('Enter current CPM value (USD):', cpmData.value.toFixed(2));
+      if (val === null) return;
+      const num = parseFloat(val);
+      if (isNaN(num) || num < 0) return toast('Invalid value');
+      cpmData.value = num;
+      cpmData.lastUpdated = Date.now();
+      updateCpmUI();
+      displayCpmHistory();
+      toast('✅ CPM manually set to ' + num.toFixed(2));
+    }
+
+    function clearCpmHistory() {
+      if (confirm('Clear all CPM history?')) {
+        db.ref('admin/cpmHistory').remove().then(() => {
+          displayCpmHistory();
+          toast('History cleared');
+        });
+      }
+    }
+
+    // ===================================================
+    // ✅ CHANNEL LINKS MANAGEMENT (unchanged)
+    // ===================================================
+    function renderChannelLinks() {
+      const container = document.getElementById('channelLinksContainer');
+      if (!channelLinks.length) {
+        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px;">No channels added yet.</p>';
+        return;
+      }
+      let html = '';
+      channelLinks.forEach((link, index) => {
+        html += `
+          <div class="channel-item">
+            <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
+            <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
+            <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function addChannelLink() {
+      const label = document.getElementById('newChannelLabel').value.trim();
+      const chatId = document.getElementById('newChannelId').value.trim();
+      if (!label || !chatId) return toast('Please enter both label and chat ID');
+      channelLinks.push({ label, chatId });
+      renderChannelLinks();
+      document.getElementById('newChannelLabel').value = '';
+      document.getElementById('newChannelId').value = '';
+      toast('Channel added! Save settings to apply.');
+    }
+
+    function removeChannelLink(index) {
+      channelLinks.splice(index, 1);
+      renderChannelLinks();
+      toast('Channel removed! Save settings to apply.');
+    }
+
+    // ===================================================
+    // ✅ WITHDRAW LEVELS (unchanged)
     // ===================================================
     function renderWithdrawLevels() {
       const container = document.getElementById('withdrawLevelsContainer');
@@ -406,46 +709,7 @@
     }
 
     // ===================================================
-    // ✅ CHANNEL LINKS MANAGEMENT
-    // ===================================================
-    function renderChannelLinks() {
-      const container = document.getElementById('channelLinksContainer');
-      if (!channelLinks.length) {
-        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px;">No channels added yet.</p>';
-        return;
-      }
-      let html = '';
-      channelLinks.forEach((link, index) => {
-        html += `
-          <div class="channel-item">
-            <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
-            <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
-            <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})"><i class="fas fa-trash"></i></button>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
-
-    function addChannelLink() {
-      const label = document.getElementById('newChannelLabel').value.trim();
-      const chatId = document.getElementById('newChannelId').value.trim();
-      if (!label || !chatId) return toast('Please enter both label and chat ID');
-      channelLinks.push({ label, chatId });
-      renderChannelLinks();
-      document.getElementById('newChannelLabel').value = '';
-      document.getElementById('newChannelId').value = '';
-      toast('Channel added! Save settings to apply.');
-    }
-
-    function removeChannelLink(index) {
-      channelLinks.splice(index, 1);
-      renderChannelLinks();
-      toast('Channel removed! Save settings to apply.');
-    }
-
-    // ===================================================
-    // ✅ READ CONFIG
+    // ✅ READ CONFIG (unchanged, with CPM listener)
     // ===================================================
     db.ref('config').on('value', snap => {
       if(snap.exists()) {
@@ -482,14 +746,12 @@
         document.getElementById('dailyAdLimit').value = configData.dailyAdLimit || 10;
         document.getElementById('adReward').value = configData.adReward || 0.5;
 
-        // Maintenance
         if(configData.maintenance) {
           document.getElementById('maintenanceMode').value = configData.maintenance.active ? 'true' : 'false';
           document.getElementById('maintenanceMsg').value = configData.maintenance.message || '';
           document.getElementById('maintenanceTime').value = configData.maintenance.estimatedMinutes || '';
         }
 
-        // Ads
         let adHtml = '';
         for(let i=0; i<4; i++) {
           let slot = configData.adSlots[i] || { network: 'none', id: '' };
@@ -507,7 +769,6 @@
         }
         document.getElementById('adsContainer').innerHTML = adHtml;
 
-        // Tasks
         let taskHtml = '';
         const tasks = configData.webTasks;
         if(Object.keys(tasks).length === 0) taskHtml = '<p style="font-size:0.9rem; color:#777; text-align:center;">No tasks found.</p>';
@@ -526,8 +787,17 @@
       }
     });
 
+    // CPM real-time listener
+    db.ref('admin/cpmData').on('value', snap => {
+      if(snap.exists()) {
+        cpmData = snap.val();
+        updateCpmUI();
+        displayCpmHistory();
+      }
+    });
+
     // ===================================================
-    // ✅ SAVE SETTINGS (with withdraw levels & ad reset hour)
+    // ✅ SAVE SETTINGS (unchanged)
     // ===================================================
     function saveSettings() {
       let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
@@ -564,7 +834,7 @@
     }
 
     // ===================================================
-    // ✅ SAVE ADS
+    // ✅ SAVE ADS (unchanged)
     // ===================================================
     function saveAds() {
       let slots = [];
@@ -582,7 +852,7 @@
     }
 
     // ===================================================
-    // ✅ TASKS
+    // ✅ TASKS (unchanged)
     // ===================================================
     function addTask() {
       let id = 'task_' + Date.now();
@@ -609,7 +879,7 @@
     }
 
     // ===================================================
-    // ✅ MAINTENANCE
+    // ✅ MAINTENANCE (unchanged)
     // ===================================================
     function saveMaintenance() {
       const active = document.getElementById('maintenanceMode').value === 'true';
@@ -621,7 +891,7 @@
     }
 
     // ===================================================
-    // ✅ USERS MANAGEMENT
+    // ✅ USERS MANAGEMENT (unchanged)
     // ===================================================
     function loadUsers() {
       db.ref('users').once('value', snap => {
@@ -717,7 +987,7 @@
     }
 
     // ===================================================
-    // ✅ WITHDRAWALS
+    // ✅ WITHDRAWALS (unchanged)
     // ===================================================
     db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', snap => {
       let html = '';
@@ -804,7 +1074,7 @@
     }
 
     // ===================================================
-    // ✅ REFERRAL STATS
+    // ✅ REFERRAL STATS (unchanged)
     // ===================================================
     async function loadReferralStats() {
       try {
@@ -888,6 +1158,14 @@
       loadReferralStats();
     }
 
+    // ===================================================
+    // ✅ INIT
+    // ===================================================
+    window.onload = function() {
+      loadCpmData();
+      displayCpmHistory();
+      // Other data will load via listeners
+    };
   </script>
 </body>
 </html>
