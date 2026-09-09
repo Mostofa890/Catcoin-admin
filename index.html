@@ -12,8 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
   <style>
-    /* Same styles as before – unchanged */
-    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; --info: #0984e3; }
+    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { background: var(--bg); color: var(--text); padding-bottom: 30px; }
     
@@ -41,7 +40,6 @@
     .btn-green { background: linear-gradient(135deg, #00b894, #00cec9); }
     .btn-red { background: linear-gradient(135deg, #ff4757, #ff6b81); }
     .btn-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
-    .btn-info { background: linear-gradient(135deg, #0984e3, #74b9ff); }
     .btn-small { width: auto; padding: 10px 15px; font-size: 0.85rem; border-radius: 8px;}
     
     .wd-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
@@ -121,111 +119,58 @@
         width: 100px;
     }
 
-    /* ----- CPM RECOMMENDATION CARD ----- */
-    .cpm-card {
-        background: linear-gradient(135deg, #1a1a2e, #16213e);
-        color: #fff;
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    /* ====== NEW: Analytics Stats Cards ====== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 15px;
     }
-    .cpm-card .cpm-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
+    .stat-card {
+        background: var(--bg);
+        padding: 15px;
+        border-radius: 15px;
+        text-align: center;
+        border: 1px solid var(--border);
     }
-    .cpm-card .cpm-header .cpm-title {
-        font-size: 1rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .cpm-card .cpm-value {
-        font-size: 2.2rem;
+    .stat-card .num {
+        font-size: 1.8rem;
         font-weight: 900;
-        margin: 5px 0;
+        color: var(--primary);
+        line-height: 1.2;
     }
-    .cpm-card .cpm-status {
-        display: inline-block;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        margin-top: 4px;
-    }
-    .cpm-card .cpm-status.good { background: rgba(0,184,148,0.25); color: #00b894; }
-    .cpm-card .cpm-status.poor { background: rgba(255,71,87,0.25); color: #ff4757; }
-    .cpm-card .cpm-status.moderate { background: rgba(243,156,18,0.25); color: #f39c12; }
-    .cpm-card .cpm-recommendation {
-        margin-top: 15px;
-        padding: 12px 16px;
-        border-radius: 12px;
-        background: rgba(255,255,255,0.08);
-        border-left: 4px solid var(--primary);
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
-    .cpm-card .cpm-recommendation i { margin-right: 8px; }
-    .cpm-card .cpm-actions {
-        margin-top: 15px;
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    .cpm-card .cpm-actions .btn-small { width: auto; padding: 8px 16px; font-size: 0.8rem; }
-    .cpm-card .last-updated {
+    .stat-card .label {
         font-size: 0.7rem;
-        opacity: 0.5;
-        margin-top: 12px;
+        color: #888;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
-
-    /* History log */
-    .cpm-history {
-        max-height: 200px;
-        overflow-y: auto;
-        font-size: 0.8rem;
-    }
-    .cpm-history .log-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 0;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-        color: rgba(255,255,255,0.7);
-    }
-    .cpm-history .log-item .time { opacity: 0.6; }
-    .cpm-history .log-item .val { font-weight: 600; }
-    .cpm-history .log-item .val.good { color: #00b894; }
-    .cpm-history .log-item .val.poor { color: #ff4757; }
-
-    /* New: API config box inside CPM card */
-    .cpm-api-box {
-        margin-top: 15px;
-        padding: 12px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.08);
-    }
-    .cpm-api-box input {
+    .stat-card.green .num { color: var(--success); }
+    .stat-card.warning .num { color: var(--warning); }
+    .stat-card.danger .num { color: var(--danger); }
+    
+    .activity-table {
         width: 100%;
-        padding: 10px 12px;
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.15);
-        background: rgba(255,255,255,0.08);
-        color: #fff;
         font-size: 0.85rem;
-        margin-bottom: 8px;
+        border-collapse: collapse;
     }
-    .cpm-api-box input::placeholder { color: rgba(255,255,255,0.3); }
-    .cpm-api-box .api-status {
-        font-size: 0.75rem;
-        opacity: 0.6;
-        display: flex;
-        justify-content: space-between;
+    .activity-table th {
+        text-align: left;
+        padding: 8px 6px;
+        border-bottom: 2px solid #eee;
+        font-weight: 700;
+        color: #555;
     }
+    .activity-table td {
+        padding: 8px 6px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .activity-table tr:hover { background: rgba(108,92,231,0.03); }
+    .activity-table .user-id { font-weight: 600; color: var(--primary); }
+    .activity-table .click-rate { font-weight: 600; }
+    .activity-table .click-rate.high { color: var(--success); }
+    .activity-table .click-rate.low { color: var(--danger); }
   </style>
 </head>
 <body>
@@ -234,8 +179,8 @@
 
   <div class="container">
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('cpm', this)"><i class="fas fa-chart-line"></i> CPM Monitor</div>
-      <div class="tab" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> General</div>
+      <div class="tab" onclick="switchTab('analytics', this)"><i class="fas fa-chart-bar"></i> Analytics</div>
+      <div class="tab active" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> General</div>
       <div class="tab" onclick="switchTab('users', this)"><i class="fas fa-users"></i> Users</div>
       <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-wallet"></i> Payouts</div>
       <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-ad"></i> Ads & Tasks</div>
@@ -243,68 +188,30 @@
       <div class="tab" onclick="switchTab('referrals', this)"><i class="fas fa-user-plus"></i> Referrals</div>
     </div>
 
-    <!-- ================= CPM MONITOR TAB ================= -->
-    <div id="tab-cpm" class="tab-content active">
-      <div class="cpm-card" id="cpmCard">
-        <div class="cpm-header">
-          <span class="cpm-title"><i class="fas fa-bolt" style="color:#facc15;"></i> Live CPM Status</span>
-          <span id="cpmLastUpdate" style="font-size:0.7rem; opacity:0.5;">—</span>
+    <!-- ================= ANALYTICS TAB (NEW) ================= -->
+    <div id="tab-analytics" class="tab-content">
+      <div class="card">
+        <h3><i class="fas fa-chart-line"></i> Ad Activity Overview</h3>
+        <div class="stats-grid" id="analyticsStats">
+          <div class="stat-card"><div class="num" id="totalUsers">0</div><div class="label">Active Users</div></div>
+          <div class="stat-card green"><div class="num" id="totalAdViews">0</div><div class="label">Total Ad Views</div></div>
+          <div class="stat-card warning"><div class="num" id="totalAdClicks">0</div><div class="label">Total Ad Clicks</div></div>
+          <div class="stat-card danger"><div class="num" id="avgClickRate">0%</div><div class="label">Avg Click Rate</div></div>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-          <div>
-            <div style="font-size:0.8rem; opacity:0.6;">Current CPM (USD)</div>
-            <div class="cpm-value" id="cpmValue">0.00</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:0.8rem; opacity:0.6;">Status</div>
-            <span class="cpm-status" id="cpmStatusBadge">—</span>
-          </div>
+        <div style="overflow-x:auto;">
+          <table class="activity-table">
+            <thead><tr><th>User</th><th>Views</th><th>Clicks</th><th>Click Rate</th><th>Last Active</th></tr></thead>
+            <tbody id="analyticsTableBody">
+              <tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">Loading data...</td></tr>
+            </tbody>
+          </table>
         </div>
-        <div class="cpm-recommendation" id="cpmRecommendation">
-          <i class="fas fa-lightbulb"></i> Loading recommendation...
-        </div>
-        
-        <!-- ===== NEW: Monetag API Integration ===== -->
-        <div class="cpm-api-box">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <i class="fas fa-link" style="color:#74b9ff;"></i>
-            <span style="font-size:0.85rem; font-weight:600;">Monetag CPM API</span>
-          </div>
-          <input type="text" id="cpmApiUrl" placeholder="https://api.monetag.com/v1/cpm?zone=YOUR_ZONE_ID" />
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-info btn-small" onclick="fetchMonetagCpm()" style="flex:1;">
-              <i class="fas fa-cloud-download-alt"></i> Fetch from API
-            </button>
-            <button class="btn btn-warning btn-small" onclick="saveCpmApiUrl()" style="flex:1;">
-              <i class="fas fa-save"></i> Save URL
-            </button>
-          </div>
-          <div class="api-status">
-            <span id="cpmApiStatus">⚪ Not configured</span>
-            <span id="cpmApiLastFetch">—</span>
-          </div>
-        </div>
-
-        <div class="cpm-actions">
-          <button class="btn btn-info btn-small" onclick="simulateCpmCheck()"><i class="fas fa-sync"></i> Simulate Check</button>
-          <button class="btn btn-warning btn-small" onclick="manuallySetCpm()"><i class="fas fa-pen"></i> Set Manually</button>
-        </div>
-
-        <div style="margin-top:15px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="font-size:0.85rem; font-weight:600;">Recent History</span>
-            <button class="btn btn-small" style="width:auto; padding:4px 12px; font-size:0.7rem; background:rgba(255,255,255,0.1);" onclick="clearCpmHistory()">Clear</button>
-          </div>
-          <div class="cpm-history" id="cpmHistory">
-            <div style="text-align:center; color:rgba(255,255,255,0.3); padding:10px;">No data yet</div>
-          </div>
-        </div>
-        <div class="last-updated" id="cpmFooter">Last updated: —</div>
+        <button class="btn btn-small btn-info" onclick="refreshAnalytics()" style="width:auto; margin-top:10px;"><i class="fas fa-sync"></i> Refresh</button>
       </div>
     </div>
 
-    <!-- ================= SETTINGS TAB (unchanged, but with API URL save) ================= -->
-    <div id="tab-settings" class="tab-content">
+    <!-- ================= SETTINGS TAB (unchanged) ================= -->
+    <div id="tab-settings" class="tab-content active">
       <!-- All previous settings cards remain exactly the same -->
       <div class="card">
         <h3><i class="fas fa-robot"></i> App Details</h3>
@@ -471,7 +378,7 @@
     let withdrawLevels = [];
 
     // ===================================================
-    // ✅ REFERRAL LEVELS (unchanged)
+    // ✅ REFERRAL LEVELS
     // ===================================================
     const REFERRAL_LEVELS = {
       BEGINNER: { min: 0, label: '⭐ BEGINNER', class: 'beginner' },
@@ -503,238 +410,651 @@
       if(id === 'users') loadUsers();
       if(id === 'withdrawals') loadAllWithdrawals();
       if(id === 'referrals') loadReferralStats();
-      if(id === 'cpm') { loadCpmData(); loadCpmApiUrl(); }
+      if(id === 'analytics') loadAnalytics();
     }
 
     // ===================================================
-    // ✅ CPM MONITORING + MONETAG API INTEGRATION
+    // ✅ ANALYTICS – USER ACTIVITY TRACKING (NEW)
     // ===================================================
-    let cpmData = { value: 0.0, status: 'moderate', recommendation: '', lastUpdated: Date.now() };
-    const CPM_THRESHOLD_GOOD = 2.5;
-    const CPM_THRESHOLD_MODERATE = 1.2;
-    let cpmApiUrl = '';
-
-    // Load saved API URL from Firebase
-    function loadCpmApiUrl() {
-      db.ref('admin/cpmApiUrl').once('value', snap => {
-        if(snap.exists()) {
-          cpmApiUrl = snap.val();
-          document.getElementById('cpmApiUrl').value = cpmApiUrl;
-          document.getElementById('cpmApiStatus').innerHTML = '✅ API URL saved';
-        } else {
-          document.getElementById('cpmApiStatus').innerHTML = '⚪ No API URL configured';
-        }
-      });
-    }
-
-    function saveCpmApiUrl() {
-      const url = document.getElementById('cpmApiUrl').value.trim();
-      if (!url) return toast('Please enter a valid API URL');
-      cpmApiUrl = url;
-      db.ref('admin/cpmApiUrl').set(url).then(() => {
-        document.getElementById('cpmApiStatus').innerHTML = '✅ API URL saved';
-        toast('API URL saved!');
-      });
-    }
-
-    // Fetch real CPM from Monetag API
-    async function fetchMonetagCpm() {
-      const url = document.getElementById('cpmApiUrl').value.trim();
-      if (!url) {
-        toast('⚠️ Please set your Monetag API URL first!');
-        return;
-      }
-
-      toast('⏳ Fetching CPM from Monetag...');
-      document.getElementById('cpmApiStatus').innerHTML = '⏳ Fetching...';
-
+    async function loadAnalytics() {
       try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
+        const usersSnap = await db.ref('users').once('value');
+        let userData = [];
+        let totalViews = 0;
+        let totalClicks = 0;
+        let activeUsers = 0;
+        const today = new Date().toISOString().slice(0, 10);
 
-        // 🔥 IMPORTANT: Parse the response based on your Monetag API structure
-        // This is a generic parser – you must adjust it to match Monetag's actual response
-        let cpmValue = 0;
-        if (data && typeof data === 'object') {
-          // Try common patterns: { cpm: 2.5 } or { data: { cpm: 2.5 } } or { result: 2.5 }
-          cpmValue = data.cpm || data.CPM || data.value || data.result || data.data?.cpm || 0;
-          if (typeof cpmValue === 'string') cpmValue = parseFloat(cpmValue);
-          if (isNaN(cpmValue)) cpmValue = 0;
+        if (usersSnap.exists()) {
+          usersSnap.forEach(child => {
+            const u = child.val();
+            const id = child.key;
+            const dailyAds = u.dailyAds || {};
+            // Count views: sum of all dailyAd slots
+            let views = 0;
+            for (let key in dailyAds) {
+              views += Number(dailyAds[key]) || 0;
+            }
+            // Clicks: stored in adClicks field (if exists)
+            const clicks = u.adClicks || 0;
+            // Last active date
+            const lastActive = u.lastActive || 'Never';
+            // Check if user was active today
+            if (lastActive === today) activeUsers++;
+            
+            totalViews += views;
+            totalClicks += clicks;
+            
+            userData.push({
+              id: id,
+              name: u.name || 'User',
+              views: views,
+              clicks: clicks,
+              lastActive: lastActive
+            });
+          });
         }
 
-        if (cpmValue > 0) {
-          cpmData.value = cpmValue;
-          cpmData.lastUpdated = Date.now();
-          updateCpmUI();
-          displayCpmHistory();
-          document.getElementById('cpmApiLastFetch').textContent = '✅ Fetched: ' + new Date().toLocaleTimeString();
-          document.getElementById('cpmApiStatus').innerHTML = '✅ Last fetch successful';
-          toast('✅ CPM updated from API: ' + cpmValue.toFixed(2) + ' USD');
-        } else {
-          throw new Error('No CPM value found in response');
-        }
-      } catch (error) {
-        console.error('Monetag API error:', error);
-        document.getElementById('cpmApiStatus').innerHTML = '❌ Fetch failed: ' + error.message;
-        toast('❌ Failed to fetch CPM: ' + error.message);
-      }
-    }
+        // Sort by views descending
+        userData.sort((a, b) => b.views - a.views);
 
-    // ===================================================
-    // CPM CORE FUNCTIONS (unchanged but updated to use API)
-    // ===================================================
-    function loadCpmData() {
-      db.ref('admin/cpmData').once('value', snap => {
-        if(snap.exists()) {
-          cpmData = snap.val();
-        } else {
-          cpmData = { value: 1.8, status: 'moderate', recommendation: 'সিপিএম মাঝারি। আপনি অ্যাড রেট সামান্য বাড়াতে বা কমাতে পারেন।', lastUpdated: Date.now() };
-          db.ref('admin/cpmData').set(cpmData);
-        }
-        updateCpmUI();
-      });
-    }
+        // Update stats cards
+        document.getElementById('totalUsers').textContent = usersSnap.exists() ? usersSnap.numChildren() : 0;
+        document.getElementById('totalAdViews').textContent = totalViews;
+        document.getElementById('totalAdClicks').textContent = totalClicks;
+        const clickRate = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : 0;
+        document.getElementById('avgClickRate').textContent = clickRate + '%';
 
-    function updateCpmUI() {
-      const val = cpmData.value || 0;
-      document.getElementById('cpmValue').textContent = val.toFixed(2);
-      
-      let statusText, statusClass;
-      if (val >= CPM_THRESHOLD_GOOD) {
-        statusText = '✅ ভালো (High)';
-        statusClass = 'good';
-        cpmData.status = 'good';
-        cpmData.recommendation = '📈 সিপিএম ভালো! আপনি অ্যাড রিওয়ার্ড বা স্লটের সংখ্যা বাড়াতে পারেন। ইউজারদের আরও আকর্ষণীয় অফার দিন।';
-      } else if (val >= CPM_THRESHOLD_MODERATE) {
-        statusText = '⚡ মাঝারি (Moderate)';
-        statusClass = 'moderate';
-        cpmData.status = 'moderate';
-        cpmData.recommendation = '📊 সিপিএম মাঝারি। আপনি অ্যাড রেট বা স্লট সংখ্যা সামান্য বাড়াতে বা কমাতে পারেন। বর্তমান রেট ঠিক আছে।';
-      } else {
-        statusText = '⚠️ খারাপ (Low)';
-        statusClass = 'poor';
-        cpmData.status = 'poor';
-        cpmData.recommendation = '📉 সিপিএম খারাপ! অ্যাড রিওয়ার্ড বা স্লট কমানোর পরামর্শ দেওয়া হচ্ছে। অ্যাড নেটওয়ার্ক পরিবর্তনের কথাও ভাবতে পারেন।';
-      }
-      
-      const badge = document.getElementById('cpmStatusBadge');
-      badge.textContent = statusText;
-      badge.className = 'cpm-status ' + statusClass;
-
-      document.getElementById('cpmRecommendation').innerHTML = `<i class="fas fa-lightbulb"></i> ${cpmData.recommendation}`;
-      
-      const lastUp = new Date(cpmData.lastUpdated);
-      const timeStr = lastUp.toLocaleString();
-      document.getElementById('cpmLastUpdate').textContent = 'Updated: ' + timeStr;
-      document.getElementById('cpmFooter').textContent = 'Last updated: ' + timeStr;
-
-      db.ref('admin/cpmData').update({
-        value: cpmData.value,
-        status: cpmData.status,
-        recommendation: cpmData.recommendation,
-        lastUpdated: cpmData.lastUpdated
-      });
-
-      pushCpmHistory(cpmData.value, cpmData.status);
-    }
-
-    function pushCpmHistory(value, status) {
-      const historyRef = db.ref('admin/cpmHistory');
-      historyRef.push({
-        value: value,
-        status: status,
-        timestamp: Date.now(),
-        source: 'api' // track source
-      }).then(() => {
-        historyRef.limitToLast(20).once('value', snap => {
-          let count = 0, toRemove = [];
-          snap.forEach(child => { count++; if (count > 20) toRemove.push(child.key); });
-          toRemove.forEach(key => historyRef.child(key).remove());
-        });
-      });
-    }
-
-    function displayCpmHistory() {
-      const container = document.getElementById('cpmHistory');
-      db.ref('admin/cpmHistory').orderByChild('timestamp').limitToLast(20).once('value', snap => {
-        let items = [];
-        snap.forEach(child => { items.push(child.val()); });
-        items.reverse();
-        if (!items.length) {
-          container.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.3); padding:10px;">No history yet</div>';
+        // Build table
+        const tbody = document.getElementById('analyticsTableBody');
+        if (userData.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No user activity data yet.</td></tr>';
           return;
         }
+
         let html = '';
-        items.forEach(item => {
-          const time = new Date(item.timestamp).toLocaleTimeString();
-          const statusClass = item.status === 'good' ? 'good' : (item.status === 'poor' ? 'poor' : '');
-          const source = item.source === 'api' ? '🌐' : '🖊️';
-          html += `<div class="log-item">
-            <span class="time">${time} ${source}</span>
-            <span class="val ${statusClass}">${item.value.toFixed(2)} USD</span>
+        userData.forEach(u => {
+          const rate = u.views > 0 ? ((u.clicks / u.views) * 100).toFixed(1) : 0;
+          const rateClass = rate >= 30 ? 'high' : (rate >= 10 ? '' : 'low');
+          const lastActiveStr = u.lastActive === today ? '🟢 Today' : u.lastActive;
+          html += `
+            <tr>
+              <td class="user-id">${u.name}<br><span style="font-size:0.7rem; color:#999;">${u.id}</span></td>
+              <td><strong>${u.views}</strong></td>
+              <td><strong>${u.clicks}</strong></td>
+              <td><span class="click-rate ${rateClass}">${rate}%</span></td>
+              <td style="font-size:0.75rem;">${lastActiveStr}</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+
+      } catch (e) {
+        console.error('Analytics error:', e);
+        document.getElementById('analyticsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger);">Error loading analytics</td></tr>';
+      }
+    }
+
+    function refreshAnalytics() {
+      toast('Refreshing analytics...');
+      loadAnalytics();
+    }
+
+    // ===================================================
+    // ✅ WITHDRAW LEVELS MANAGEMENT (unchanged)
+    // ===================================================
+    function renderWithdrawLevels() {
+      const container = document.getElementById('withdrawLevelsContainer');
+      if (!withdrawLevels.length) {
+        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px; font-size:0.85rem;">No levels configured. Add a level below.</p>';
+        return;
+      }
+      let html = '';
+      withdrawLevels.forEach((level, index) => {
+        html += `
+          <div class="level-edit-item">
+            <div class="level-header">
+              <span class="level-num">Level ${index + 1}</span>
+              <button class="btn btn-red btn-small" onclick="removeWithdrawLevel(${index})" style="width:auto; padding:4px 10px; font-size:0.7rem;"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="level-fields">
+              <input type="number" value="${level.requiredRefs}" id="wl_refs_${index}" placeholder="Refs" style="width:60px;">
+              <input type="number" value="${level.fee}" id="wl_fee_${index}" placeholder="Fee %" style="width:60px;">
+              <input type="number" value="${level.minAmount}" id="wl_min_${index}" placeholder="Min" style="width:70px;">
+              <input type="number" value="${level.maxAmount}" id="wl_max_${index}" placeholder="Max" style="width:70px;">
+              <input type="text" value="${level.time}" id="wl_time_${index}" placeholder="Time" class="wide" style="width:100px;">
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function addWithdrawLevel() {
+      withdrawLevels.push({
+        requiredRefs: 5,
+        fee: 5,
+        minAmount: 10,
+        maxAmount: 100,
+        time: "24-48 Hours"
+      });
+      renderWithdrawLevels();
+      toast('Level added! Save settings to apply.');
+    }
+
+    function removeWithdrawLevel(index) {
+      if (withdrawLevels.length <= 1) {
+        toast('Cannot remove last level!');
+        return;
+      }
+      if(confirm('Remove this level?')) {
+        withdrawLevels.splice(index, 1);
+        renderWithdrawLevels();
+        toast('Level removed! Save settings to apply.');
+      }
+    }
+
+    function getWithdrawLevelsFromUI() {
+      const levels = [];
+      withdrawLevels.forEach((_, index) => {
+        const refs = parseInt(document.getElementById(`wl_refs_${index}`).value) || 5;
+        const fee = parseFloat(document.getElementById(`wl_fee_${index}`).value) || 5;
+        const minAmt = parseFloat(document.getElementById(`wl_min_${index}`).value) || 10;
+        const maxAmt = parseFloat(document.getElementById(`wl_max_${index}`).value) || 100;
+        const time = document.getElementById(`wl_time_${index}`).value || "24-48 Hours";
+        levels.push({ requiredRefs: refs, fee: fee, minAmount: minAmt, maxAmount: maxAmt, time: time });
+      });
+      return levels;
+    }
+
+    // ===================================================
+    // ✅ CHANNEL LINKS MANAGEMENT (unchanged)
+    // ===================================================
+    function renderChannelLinks() {
+      const container = document.getElementById('channelLinksContainer');
+      if (!channelLinks.length) {
+        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px;">No channels added yet.</p>';
+        return;
+      }
+      let html = '';
+      channelLinks.forEach((link, index) => {
+        html += `
+          <div class="channel-item">
+            <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
+            <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
+            <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function addChannelLink() {
+      const label = document.getElementById('newChannelLabel').value.trim();
+      const chatId = document.getElementById('newChannelId').value.trim();
+      if (!label || !chatId) return toast('Please enter both label and chat ID');
+      channelLinks.push({ label, chatId });
+      renderChannelLinks();
+      document.getElementById('newChannelLabel').value = '';
+      document.getElementById('newChannelId').value = '';
+      toast('Channel added! Save settings to apply.');
+    }
+
+    function removeChannelLink(index) {
+      channelLinks.splice(index, 1);
+      renderChannelLinks();
+      toast('Channel removed! Save settings to apply.');
+    }
+
+    // ===================================================
+    // ✅ READ CONFIG (unchanged)
+    // ===================================================
+    db.ref('config').on('value', snap => {
+      if(snap.exists()) {
+        configData = snap.val();
+        if(!configData.adSlots) configData.adSlots = [{},{},{},{}];
+        if(!configData.webTasks) configData.webTasks = {};
+        
+        channelLinks = configData.channelLinks || [
+          {label:'NexEarn Channel', chatId:'nexearn2'},
+          {label:'NexEarn Adda', chatId:'nexearn2_adda'}
+        ];
+        renderChannelLinks();
+        
+        withdrawLevels = configData.withdrawLevels || [
+          { requiredRefs: 5, fee: 5, minAmount: 10, maxAmount: 100, time: "24-48 Hours" },
+          { requiredRefs: 7, fee: 4, minAmount: 10, maxAmount: 200, time: "24-48 Hours" },
+          { requiredRefs: 7, fee: 3, minAmount: 10, maxAmount: 300, time: "12-24 Hours" },
+          { requiredRefs: 7, fee: 2, minAmount: 10, maxAmount: 400, time: "12-24 Hours" },
+          { requiredRefs: 7, fee: 1, minAmount: 10, maxAmount: 500, time: "6-12 Hours" }
+        ];
+        renderWithdrawLevels();
+        
+        document.getElementById('botUsername').value = configData.botUsername || '';
+        document.getElementById('currencySymbol').value = configData.currencySymbol || 'TK';
+        document.getElementById('dailyBonusAmount').value = configData.dailyBonusAmount || 20;
+        document.getElementById('refBonus').value = configData.refBonus || 5;
+        document.getElementById('tutorialLink').value = configData.tutorialLink || '';
+        document.getElementById('supportLink').value = configData.supportLink || '';
+        document.getElementById('minWithdraw').value = configData.minWithdraw || 10;
+        document.getElementById('withdrawNotice').value = configData.withdrawNotice || '';
+        document.getElementById('paymentMethods').value = configData.paymentMethods ? configData.paymentMethods.join(', ') : 'Bkash, Nagad';
+        document.getElementById('adResetHour').value = configData.adResetHour || 0;
+        
+        document.getElementById('dailyAdLimit').value = configData.dailyAdLimit || 10;
+        document.getElementById('adReward').value = configData.adReward || 0.5;
+
+        if(configData.maintenance) {
+          document.getElementById('maintenanceMode').value = configData.maintenance.active ? 'true' : 'false';
+          document.getElementById('maintenanceMsg').value = configData.maintenance.message || '';
+          document.getElementById('maintenanceTime').value = configData.maintenance.estimatedMinutes || '';
+        }
+
+        let adHtml = '';
+        for(let i=0; i<4; i++) {
+          let slot = configData.adSlots[i] || { network: 'none', id: '' };
+          adHtml += `
+          <div style="background:#f9f9f9; padding:15px; border-radius:12px; border:1px solid #e1e1e1; margin-bottom:12px;">
+            <b style="color:var(--primary); font-size:1rem;"><i class="fas fa-layer-group"></i> Slot ${i+1}</b>
+            <select id="adNet_${i}" style="margin:10px 0;">
+              <option value="none" ${slot.network==='none'?'selected':''}>Disabled (None)</option>
+              <option value="adsgram" ${slot.network==='adsgram'?'selected':''}>Adsgram</option>
+              <option value="monetag" ${slot.network==='monetag'?'selected':''}>Monetag</option>
+              <option value="gigapub" ${slot.network==='gigapub'?'selected':''}>GigaPub</option>
+            </select>
+            <input type="text" id="adId_${i}" value="${slot.id||''}" placeholder="Block ID / Zone ID">
+          </div>`;
+        }
+        document.getElementById('adsContainer').innerHTML = adHtml;
+
+        let taskHtml = '';
+        const tasks = configData.webTasks;
+        if(Object.keys(tasks).length === 0) taskHtml = '<p style="font-size:0.9rem; color:#777; text-align:center;">No tasks found.</p>';
+        Object.keys(tasks).forEach(k => {
+          let t = tasks[k];
+          taskHtml += `
+          <div style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <b style="color:var(--text); font-size:1rem;">${t.name}</b> <span style="color:var(--primary); font-weight:800; background:rgba(108,92,231,0.1); padding:2px 8px; border-radius:8px;">+${t.reward}</span><br>
+              <small style="color:#777; word-break:break-all;">${t.url}</small>
+            </div>
+            <button class="btn btn-red btn-small" onclick="deleteTask('${k}')"><i class="fas fa-trash"></i></button>
           </div>`;
         });
-        container.innerHTML = html;
+        document.getElementById('tasksList').innerHTML = taskHtml;
+      }
+    });
+
+    // ===================================================
+    // ✅ SAVE SETTINGS (unchanged)
+    // ===================================================
+    function saveSettings() {
+      let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
+      
+      const newChannelLinks = [];
+      channelLinks.forEach((link, index) => {
+        const label = document.getElementById(`channelLabel_${index}`);
+        const chatId = document.getElementById(`channelId_${index}`);
+        if (label && chatId) {
+          newChannelLinks.push({ label: label.value, chatId: chatId.value });
+        }
+      });
+      
+      const levels = getWithdrawLevelsFromUI();
+      
+      db.ref('config').update({
+        botUsername: document.getElementById('botUsername').value,
+        currencySymbol: document.getElementById('currencySymbol').value,
+        dailyBonusAmount: Number(document.getElementById('dailyBonusAmount').value),
+        refBonus: Number(document.getElementById('refBonus').value),
+        tutorialLink: document.getElementById('tutorialLink').value,
+        supportLink: document.getElementById('supportLink').value,
+        minWithdraw: Number(document.getElementById('minWithdraw').value),
+        withdrawNotice: document.getElementById('withdrawNotice').value,
+        paymentMethods: methods,
+        channelLinks: newChannelLinks,
+        withdrawLevels: levels,
+        adResetHour: Number(document.getElementById('adResetHour').value) || 0
+      }).then(() => {
+        channelLinks = newChannelLinks;
+        withdrawLevels = levels;
+        toast('Settings Saved Successfully!');
       });
     }
 
-    function simulateCpmCheck() {
-      toast('⏳ Simulating CPM check...');
-      setTimeout(() => {
-        const randomCpm = 0.5 + Math.random() * 3.5;
-        cpmData.value = randomCpm;
-        cpmData.lastUpdated = Date.now();
-        updateCpmUI();
-        displayCpmHistory();
-        document.getElementById('cpmApiLastFetch').textContent = '🔄 Simulated: ' + new Date().toLocaleTimeString();
-        toast('✅ CPM simulated: ' + randomCpm.toFixed(2) + ' USD');
-      }, 1500);
+    // ===================================================
+    // ✅ SAVE ADS (unchanged)
+    // ===================================================
+    function saveAds() {
+      let slots = [];
+      for(let i=0; i<4; i++) {
+        slots.push({
+          network: document.getElementById(`adNet_${i}`).value,
+          id: document.getElementById(`adId_${i}`).value
+        });
+      }
+      db.ref('config').update({
+        dailyAdLimit: Number(document.getElementById('dailyAdLimit').value),
+        adReward: Number(document.getElementById('adReward').value),
+        adSlots: slots
+      }).then(() => toast('Ad Settings Saved!'));
     }
 
-    function manuallySetCpm() {
-      const val = prompt('Enter current CPM value (USD):', cpmData.value.toFixed(2));
-      if (val === null) return;
-      const num = parseFloat(val);
-      if (isNaN(num) || num < 0) return toast('Invalid value');
-      cpmData.value = num;
-      cpmData.lastUpdated = Date.now();
-      updateCpmUI();
-      displayCpmHistory();
-      document.getElementById('cpmApiLastFetch').textContent = '🖊️ Manual: ' + new Date().toLocaleTimeString();
-      toast('✅ CPM manually set to ' + num.toFixed(2));
+    // ===================================================
+    // ✅ TASKS (unchanged)
+    // ===================================================
+    function addTask() {
+      let id = 'task_' + Date.now();
+      let data = {
+        name: document.getElementById('taskName').value,
+        reward: Number(document.getElementById('taskReward').value),
+        url: document.getElementById('taskUrl').value,
+        icon: document.getElementById('taskIcon').value || 'https://via.placeholder.com/45'
+      };
+      if(!data.name || !data.url || !data.reward) return toast('Please fill Name, Reward & URL');
+      db.ref('config/webTasks/' + id).set(data).then(() => { 
+        toast('Task Added Successfully'); 
+        document.getElementById('taskName').value = ''; 
+        document.getElementById('taskReward').value = ''; 
+        document.getElementById('taskUrl').value = ''; 
+        document.getElementById('taskIcon').value = ''; 
+      });
     }
 
-    function clearCpmHistory() {
-      if (confirm('Clear all CPM history?')) {
-        db.ref('admin/cpmHistory').remove().then(() => {
-          displayCpmHistory();
-          toast('History cleared');
+    function deleteTask(id) { 
+      if(confirm('Are you sure you want to delete this task?')) {
+        db.ref('config/webTasks/' + id).remove().then(() => toast('Task Deleted!'));
+      }
+    }
+
+    // ===================================================
+    // ✅ MAINTENANCE (unchanged)
+    // ===================================================
+    function saveMaintenance() {
+      const active = document.getElementById('maintenanceMode').value === 'true';
+      db.ref('config/maintenance').set({
+        active: active,
+        message: document.getElementById('maintenanceMsg').value,
+        estimatedMinutes: Number(document.getElementById('maintenanceTime').value) || 30
+      }).then(() => toast('Maintenance settings updated!'));
+    }
+
+    // ===================================================
+    // ✅ USERS MANAGEMENT (unchanged)
+    // ===================================================
+    function loadUsers() {
+      db.ref('users').once('value', snap => {
+        allUsers = [];
+        if(snap.exists()) {
+          snap.forEach(child => {
+            let u = child.val();
+            u.id = child.key;
+            allUsers.push(u);
+          });
+        }
+        filterUsers();
+      });
+    }
+
+    function filterUsers() {
+      const search = document.getElementById('userSearch').value.toLowerCase();
+      filteredUsers = allUsers.filter(u => 
+        (u.id && u.id.toString().includes(search)) || 
+        (u.name && u.name.toLowerCase().includes(search))
+      );
+      renderUsers();
+    }
+
+    function renderUsers() {
+      const container = document.getElementById('usersContainer');
+      if(filteredUsers.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No users found.</p>';
+        return;
+      }
+      let html = '';
+      filteredUsers.forEach(u => {
+        const isBanned = u.isBanned || false;
+        const statusClass = isBanned ? 'banned' : 'active';
+        const statusText = isBanned ? '🚫 Banned' : '✅ Active';
+        const isVerified = u.channelVerified || false;
+        const wdCount = u.withdrawCount || 0;
+        const refs = u.referrals || 0;
+        const level = getReferralLevel(refs);
+        html += `
+        <div class="user-card">
+          <div class="user-info">
+            <div class="name">${u.name || 'Unknown'} <span class="status-badge ${statusClass}">${statusText}</span></div>
+            <div class="id">ID: ${u.id} ${isVerified ? '✅ Verified' : '❌ Not Verified'} | Withdraws: ${wdCount}</div>
+            <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} | Referrals: ${refs} <span class="ref-level-badge ${level.class}">${level.label}</span></div>
+          </div>
+          <div class="user-actions">
+            <button class="btn btn-green btn-small" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>
+            <button class="btn ${isBanned ? 'btn-green' : 'btn-warning'} btn-small" onclick="toggleBan('${u.id}', ${!isBanned})">
+              <i class="fas ${isBanned ? 'fa-check' : 'fa-ban'}"></i> ${isBanned ? 'Unban' : 'Ban'}
+            </button>
+            <button class="btn btn-red btn-small" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function refreshUsers() {
+      loadUsers();
+      toast('Users refreshed!');
+    }
+
+    function editUser(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if(!user) return;
+      const newBal = prompt(`Enter new balance for ${user.name || userId}:`, user.balance || 0);
+      if(newBal !== null && !isNaN(newBal)) {
+        db.ref('users/' + userId + '/balance').set(Number(newBal)).then(() => {
+          toast('Balance updated!');
+          loadUsers();
+        });
+      }
+    }
+
+    function toggleBan(userId, ban) {
+      const action = ban ? 'ban' : 'unban';
+      if(confirm(`Are you sure you want to ${action} this user?`)) {
+        db.ref('users/' + userId).update({ isBanned: ban }).then(() => {
+          toast(`User ${action}ned!`);
+          loadUsers();
+        });
+      }
+    }
+
+    function deleteUser(userId) {
+      if(confirm('⚠️ Are you sure you want to DELETE this user and all their data? This cannot be undone!')) {
+        db.ref('users/' + userId).remove().then(() => {
+          toast('User deleted!');
+          loadUsers();
         });
       }
     }
 
     // ===================================================
-    // ALL OTHER FUNCTIONS (channel, withdraw levels, users, etc.)
-    // are exactly the same as before – kept unchanged for brevity
+    // ✅ WITHDRAWALS (unchanged)
     // ===================================================
-    // ... (rest of the functions: renderChannelLinks, addChannelLink, removeChannelLink,
-    // renderWithdrawLevels, addWithdrawLevel, removeWithdrawLevel, getWithdrawLevelsFromUI,
-    // saveSettings, saveAds, addTask, deleteTask, saveMaintenance, loadUsers, filterUsers,
-    // renderUsers, refreshUsers, editUser, toggleBan, deleteUser, loadAllWithdrawals,
-    // approveWd, rejectWd, loadReferralStats, refreshReferralStats)
-    // I'm including them below in the full code – but to keep the answer clean, I'll list them
-    // in the complete code block. 
+    db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', snap => {
+      let html = '';
+      if(snap.exists()) {
+        snap.forEach(child => {
+          let req = child.val();
+          let key = child.key;
+          let date = new Date(req.timestamp).toLocaleString();
+          const feeText = req.fee ? `Fee: ${req.fee.toFixed(2)}` : '';
+          const levelText = req.level ? `Level ${req.level}` : '';
+          html += `
+          <div class="wd-card">
+            <div class="wd-head">
+              <span style="color:#0984e3; background:rgba(9,132,227,0.1); padding:4px 10px; border-radius:8px;">${req.method}</span> 
+              <span style="color:var(--primary); font-size:1.2rem;">${req.amount}</span>
+            </div>
+            <div class="wd-info">
+              <b>Account:</b> <span style="color:#d63031; font-weight:800; font-size:1.05rem;">${req.account}</span><br>
+              <b>User ID:</b> ${req.userId}<br>
+              <b>Name:</b> ${req.userName}<br>
+              <b>Level:</b> ${levelText} | ${feeText}<br>
+              <small style="color:#999;">Date: ${date}</small>
+            </div>
+            <div class="wd-actions">
+              <button class="btn btn-green btn-small" style="flex:1" onclick="approveWd('${key}')"><i class="fas fa-check"></i> Approve</button>
+              <button class="btn btn-red btn-small" style="flex:1" onclick="rejectWd('${key}', '${req.userId}', ${req.amount})"><i class="fas fa-times"></i> Reject</button>
+            </div>
+          </div>`;
+        });
+      } else { 
+        html = '<div style="text-align:center; padding:30px 10px; color:#888;"><i class="fas fa-check-circle" style="font-size:3rem; margin-bottom:15px; color:#00b894; opacity:0.8;"></i><br><b style="font-size:1.1rem; color:#444;">No Pending Requests!</b></div>'; 
+      }
+      document.getElementById('wd-container').innerHTML = html;
+    });
+
+    function loadAllWithdrawals() {
+      db.ref('withdrawals').once('value', snap => {
+        let html = '';
+        if(snap.exists()) {
+          let count = 0;
+          snap.forEach(child => {
+            let req = child.val();
+            count++;
+            const statusColor = req.status === 'approved' ? '#00b894' : req.status === 'pending' ? '#f39c12' : '#ff4757';
+            const feeText = req.fee ? `Fee: ${req.fee.toFixed(2)}` : '';
+            const levelText = req.level ? `L${req.level}` : '';
+            html += `
+            <div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
+              <span><b>${req.userName || 'User'}</b> (${req.userId}) ${levelText}</span>
+              <span>${req.method} - ${req.account}</span>
+              <span style="font-weight:800; color:var(--primary);">${req.amount} ${feeText}</span>
+              <span style="color:${statusColor}; font-weight:700; background:${statusColor}15; padding:2px 10px; border-radius:12px;">${req.status}</span>
+            </div>`;
+          });
+          if(count === 0) html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>';
+        } else {
+          html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>';
+        }
+        document.getElementById('allWdContainer').innerHTML = html;
+      });
+    }
+
+    function approveWd(id) {
+      if(confirm('Approve this payment?')) {
+        db.ref('withdrawals/' + id).update({ status: 'approved' }).then(() => toast('Payment Approved!'));
+      }
+    }
+
+    async function rejectWd(id, userId, amount) {
+      if(confirm('Reject and refund balance?')) {
+        try {
+          const userRef = db.ref('users/' + userId);
+          const snap = await userRef.once('value');
+          if(snap.exists()){
+            let bal = Number(snap.val().balance || 0);
+            await userRef.update({ balance: bal + Number(amount) });
+          }
+          await db.ref('withdrawals/' + id).update({ status: 'rejected' });
+          toast('Rejected & Refunded!');
+        } catch(e) {
+          toast('Error!');
+        }
+      }
+    }
+
     // ===================================================
+    // ✅ REFERRAL STATS (unchanged)
+    // ===================================================
+    async function loadReferralStats() {
+      try {
+        const snap = await db.ref('users').once('value');
+        let users = [];
+        let totalRefs = 0;
+        let topReferrers = [];
+        
+        if(snap.exists()) {
+          snap.forEach(child => {
+            const u = child.val();
+            if (u.referrals && u.referrals > 0) {
+              users.push({
+                id: child.key,
+                name: u.name || 'User',
+                referrals: u.referrals || 0,
+                balance: u.balance || 0
+              });
+              totalRefs += u.referrals;
+            }
+          });
+        }
+        
+        users.sort((a, b) => b.referrals - a.referrals);
+        topReferrers = users.slice(0, 10);
+        
+        const leaderContainer = document.getElementById('adminRefLeaderboard');
+        if (topReferrers.length === 0) {
+          leaderContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No referrals yet.</p>';
+        } else {
+          let html = '';
+          const medals = ['🥇', '🥈', '🥉'];
+          topReferrers.forEach((u, i) => {
+            const medal = i < 3 ? medals[i] : `#${i+1}`;
+            const level = getReferralLevel(u.referrals);
+            html += `
+            <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--bg); border-radius:12px; margin-bottom:8px; border:1px solid var(--border);">
+              <div style="font-weight:900; font-size:1.1rem; color:var(--primary); width:40px; text-align:center;">${medal}</div>
+              <div style="flex:1;">
+                <div style="font-weight:600; font-size:0.9rem;">${u.name}</div>
+                <div style="font-size:0.75rem; color:var(--text-light);">ID: ${u.id}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-weight:800; color:var(--primary);">${u.referrals} Refs</div>
+                <span class="ref-level-badge ${level.class}" style="font-size:0.6rem;">${level.label}</span>
+              </div>
+            </div>`;
+          });
+          leaderContainer.innerHTML = html;
+        }
+        
+        const statsContainer = document.getElementById('adminRefStats');
+        const totalUsers = snap.exists() ? snap.numChildren() : 0;
+        const avgRefs = totalUsers > 0 ? (totalRefs / totalUsers).toFixed(2) : 0;
+        statsContainer.innerHTML = `
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--primary);">${totalRefs}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Total Referrals</div>
+            </div>
+            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--success);">${users.length}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Users with Refs</div>
+            </div>
+            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--warning);">${avgRefs}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Avg Refs/User</div>
+            </div>
+          </div>
+          <div style="margin-top:12px; font-size:0.8rem; color:#888; text-align:center;">
+            Total Users: ${totalUsers} | Top Referrer: ${topReferrers.length > 0 ? topReferrers[0].name + ' (' + topReferrers[0].referrals + ')' : 'N/A'}
+          </div>
+        `;
+      } catch(e) {
+        console.error('Error loading referral stats:', e);
+      }
+    }
+
+    function refreshReferralStats() {
+      toast('Refreshing referral stats...');
+      loadReferralStats();
+    }
 
     // ===================================================
     // ✅ INIT
     // ===================================================
     window.onload = function() {
-      loadCpmData();
-      loadCpmApiUrl();
-      displayCpmHistory();
-      // Other data will load via listeners
+      // Load analytics if the tab is active by default? No, default is settings.
+      // But we'll load on demand when tab is switched.
+      // Also load on startup for convenience
+      loadAnalytics();
     };
   </script>
 </body>
