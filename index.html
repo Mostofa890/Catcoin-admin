@@ -327,6 +327,10 @@
     .status-badge.banned { background: var(--danger-bg); color: #b91c1c; }
     .status-badge.verified { background: var(--success-bg); color: #047857; }
     .status-badge.notverified { background: var(--danger-bg); color: #b91c1c; }
+    .status-badge.pending { background: var(--warning-bg); color: #b45309; }
+    .status-badge.processing { background: var(--info-bg); color: #1e40af; }
+    .status-badge.approved { background: var(--success-bg); color: #047857; }
+    .status-badge.cancelled { background: var(--danger-bg); color: #b91c1c; }
 
     .ref-level-badge {
       display: inline-flex; align-items: center; padding: 3px 10px;
@@ -559,7 +563,7 @@
     .cycle-info-box .cycle-value { font-size: 1.05rem; font-weight: 900; margin-top: 4px; position: relative; }
     .cycle-info-box .cycle-desc { font-size: 0.72rem; opacity: 0.85; margin-top: 8px; font-weight: 600; line-height: 1.4; position: relative; }
 
-    /* ===== ✅ NEW: USER DETAIL MODAL ===== */
+    /* ===== MODAL ===== */
     .modal-overlay {
       display: none; position: fixed; inset: 0; z-index: 9999;
       background: rgba(15, 23, 42, 0.7);
@@ -592,55 +596,38 @@
     .modal-close:hover { background: var(--danger-bg); color: var(--danger); }
     .modal-body { padding: 20px 22px; }
 
-    .detail-hero {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
-      padding: 22px 20px; border-radius: var(--radius); text-align: center;
-      margin-bottom: 16px; position: relative; overflow: hidden;
+    /* ===== TASK SYSTEM ADMIN ===== */
+    .task-input-row {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+      background: var(--bg-alt); padding: 10px; border-radius: 12px; border: 1.5px solid var(--border);
     }
-    .detail-hero::before {
-      content: ''; position: absolute; width: 140px; height: 140px;
-      background: rgba(255,255,255,0.12); border-radius: 50%;
-      top: -60px; right: -40px;
+    .task-input-row input { flex: 1; background: #fff; padding: 10px 12px; font-size: 0.82rem; }
+    .task-input-row button { flex: 0 0 auto; padding: 8px 10px; border-radius: 8px; border: none; background: var(--danger-bg); color: var(--danger); cursor: pointer; transition: all 0.2s; }
+    .task-input-row button:hover { background: var(--danger); color: #fff; }
+    
+    .submission-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+      transition: all 0.25s; cursor: pointer;
     }
-    .detail-hero-avatar {
-      width: 64px; height: 64px; border-radius: 18px;
-      background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-weight: 900; font-size: 1.6rem;
-      margin: 0 auto 10px; border: 2px solid rgba(255,255,255,0.3);
-      position: relative;
-    }
-    .detail-hero-name { font-size: 1.15rem; font-weight: 900; position: relative; }
-    .detail-hero-id { font-size: 0.72rem; opacity: 0.85; font-weight: 600; margin-top: 3px; position: relative; }
-
-    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .detail-box {
-      background: var(--bg-alt); padding: 14px 12px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); text-align: center;
-    }
-    .detail-box .lbl { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .detail-box .val { font-size: 1.05rem; font-weight: 900; color: var(--text); margin-top: 4px; letter-spacing: -0.02em; }
-    .detail-box.green .val { color: var(--success); }
-    .detail-box.purple .val { color: var(--secondary); }
-    .detail-box.info .val { color: var(--info); }
-    .detail-box.warning .val { color: var(--warning); }
-
-    .comm-history-item {
-      padding: 12px 14px; background: var(--bg-alt);
-      border-radius: var(--radius-sm); margin-bottom: 8px;
-      border-left: 3px solid var(--success); display: flex;
-      justify-content: space-between; align-items: center; gap: 10px;
-    }
-    .comm-history-item .from {
-      font-weight: 800; font-size: 0.85rem; color: var(--text);
-    }
-    .comm-history-item .sub {
-      font-size: 0.68rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;
-    }
-    .comm-history-item .amt {
-      font-weight: 900; font-size: 0.95rem; color: var(--success); text-align: right;
-    }
-    .comm-history-item .amt small { display: block; font-size: 0.62rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+    .submission-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--primary); }
+    .submission-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .submission-title { font-weight: 800; font-size: 0.95rem; color: var(--text); }
+    .submission-user { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; margin-top: 3px; }
+    .submission-meta { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+    .submission-reward { font-weight: 900; color: var(--success); font-size: 1rem; }
+    .submission-status { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .image-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 10px; }
+    .image-preview-item { position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border); background: #fff; }
+    .image-preview-item img { width: 100%; height: 100px; object-fit: cover; display: block; }
+    .image-preview-item .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s; color: #fff; font-size: 1.2rem; }
+    .image-preview-item:hover .overlay { opacity: 1; }
+    .input-data-display { background: var(--bg-alt); padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border); font-size: 0.85rem; font-weight: 600; }
+    .input-data-display .row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+    .input-data-display .row:last-child { border-bottom: none; }
+    .input-data-display .key { color: var(--text-muted); }
+    .input-data-display .val { color: var(--text); font-weight: 700; }
 
     @media (max-width: 400px) {
       .container { padding: 0 12px; }
@@ -672,7 +659,7 @@
 
   <div class="toast" id="toast">Saved!</div>
 
-  <!-- ✅ NEW: USER DETAIL MODAL -->
+  <!-- ✅ MODAL FOR USER DETAILS -->
   <div class="modal-overlay" id="userDetailModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -682,9 +669,21 @@
         </div>
         <button class="modal-close" onclick="closeUserModal()"><i class="fas fa-times"></i></button>
       </div>
-      <div class="modal-body" id="userDetailBody">
-        <!-- Filled dynamically -->
+      <div class="modal-body" id="userDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- ✅ MODAL FOR TASK SUBMISSION REVIEW -->
+  <div class="modal-overlay" id="submissionDetailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div class="card-title-icon icon-info"><i class="fas fa-file-invoice"></i></div>
+          Submission Review
+        </div>
+        <button class="modal-close" onclick="closeSubmissionModal()"><i class="fas fa-times"></i></button>
       </div>
+      <div class="modal-body" id="submissionModalBody"></div>
     </div>
   </div>
 
@@ -698,6 +697,7 @@
         <div class="tab" onclick="switchTab('users', this)"><i class="fas fa-users"></i><span>Users</span></div>
         <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-money-bill-transfer"></i><span>Payouts</span></div>
         <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-rectangle-ad"></i><span>Ads</span></div>
+        <div class="tab" onclick="switchTab('tasks', this)"><i class="fas fa-briefcase"></i><span>Tasks</span></div>
         <div class="tab" onclick="switchTab('maintenance', this)"><i class="fas fa-wrench"></i><span>System</span></div>
         <div class="tab" onclick="switchTab('referrals', this)"><i class="fas fa-user-group"></i><span>Referrals</span></div>
       </div>
@@ -902,7 +902,6 @@
         <button class="btn btn-info btn-small" onclick="refreshAnalytics()" style="margin-top:14px;"><i class="fas fa-rotate"></i> Refresh Analytics</button>
       </div>
 
-      <!-- ✅ NEW: Commission Overview Card -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
@@ -961,7 +960,7 @@
       </div>
     </div>
 
-    <!-- ================= ADS & TASKS TAB ================= -->
+    <!-- ================= ADS TAB ================= -->
     <div id="tab-ads" class="tab-content">
       <div class="card">
         <div class="card-header">
@@ -982,29 +981,67 @@
         <div id="adsContainer"></div>
         <button class="btn" onclick="saveAds()"><i class="fas fa-save"></i> Save Ad Settings</button>
       </div>
+    </div>
 
+    <!-- ================= TASKS TAB ================= -->
+    <div id="tab-tasks" class="tab-content">
+      <!-- Create New Task -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
             <div class="card-title-icon icon-success"><i class="fas fa-plus-circle"></i></div>
-            Add New Task
+            Create New Task
           </div>
         </div>
-        <div class="form-group"><label>Task Name</label><input type="text" id="taskName" placeholder="Subscribe Channel"></div>
-        <div class="form-group"><label>Reward Amount</label><input type="number" id="taskReward" placeholder="5"></div>
-        <div class="form-group"><label>Action URL</label><input type="text" id="taskUrl" placeholder="https://t.me/..."></div>
-        <div class="form-group"><label>Icon URL (Optional)</label><input type="text" id="taskIcon" placeholder="https://.../icon.png"></div>
-        <button class="btn btn-green" onclick="addTask()"><i class="fas fa-plus"></i> Add Task</button>
+        <div class="form-group"><label>Task Title</label><input type="text" id="newTaskTitle" placeholder="FRESH NEW GMAIL NEED"></div>
+        <div class="form-group"><label>Category</label><input type="text" id="newTaskCat" placeholder="Gmail Account / New Gmail Account"></div>
+        <div style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;"><label>Reward (TK)</label><input type="number" id="newTaskReward" placeholder="0.20" step="0.01"></div>
+          <div class="form-group" style="flex:1;"><label>Total Slots</label><input type="number" id="newTaskSlots" placeholder="100"></div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;"><label>Time Limit</label><input type="text" id="newTaskTime" placeholder="20 days"></div>
+        </div>
+        <div class="form-group"><label>Job Description</label><textarea id="newTaskDesc" rows="3" placeholder="Description details..."></textarea></div>
+        
+        <label style="margin-top:10px; display:block;">User Inputs (Text Fields)</label>
+        <div id="taskInputsContainer"></div>
+        <button class="btn btn-info btn-small" onclick="addTaskInputField()" style="margin-bottom:15px;"><i class="fas fa-plus"></i> Add Input Field</button>
+
+        <label style="margin-top:10px; display:block;">Required Screenshots</label>
+        <div id="taskImagesContainer"></div>
+        <button class="btn btn-warning btn-small" onclick="addTaskImageField()" style="margin-bottom:15px;"><i class="fas fa-image"></i> Add Image Field</button>
+
+        <button class="btn btn-green" onclick="saveNewTask()"><i class="fas fa-save"></i> Save Task</button>
       </div>
 
+      <!-- Active Tasks List -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
-            <div class="card-title-icon icon-warning"><i class="fas fa-list-check"></i></div>
-            Existing Tasks
+            <div class="card-title-icon icon-info"><i class="fas fa-list-check"></i></div>
+            Active Tasks
           </div>
         </div>
-        <div id="tasksList"></div>
+        <div id="activeTasksList"></div>
+      </div>
+
+      <!-- Task Submissions Review -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-purple"><i class="fas fa-file-signature"></i></div>
+            Task Submissions
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:15px; overflow-x:auto; padding-bottom:5px;">
+          <button class="btn btn-small btn-warning" onclick="filterSubmissions('pending')">Pending</button>
+          <button class="btn btn-small btn-info" onclick="filterSubmissions('processing')">Processing</button>
+          <button class="btn btn-small btn-green" onclick="filterSubmissions('approved')">Approved</button>
+          <button class="btn btn-small btn-red" onclick="filterSubmissions('cancelled')">Cancelled</button>
+          <button class="btn btn-small" style="background:#475569;" onclick="filterSubmissions('all')">All</button>
+        </div>
+        <div id="taskSubmissionsList"></div>
       </div>
     </div>
 
@@ -1086,13 +1123,15 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    let configData = { adSlots:[], webTasks:{} };
+    let configData = { adSlots:[], newTasks:{} };
     let allUsers = [];
     let filteredUsers = [];
     let channelLinks = [];
     let withdrawLevels = [];
     let MIN_REFERRAL_BALANCE = 20;
     let selectedCommissionMode = 'bonus';
+    let currentSubmissions = [];
+    let currentFilter = 'pending';
 
     const REFERRAL_LEVELS = {
       BEGINNER: { min: 0, label: '⭐ BEGINNER', class: 'beginner' },
@@ -1126,6 +1165,7 @@
       if(id === 'referrals') loadReferralStats();
       if(id === 'analytics') { loadAnalytics(); loadCommissionOverview(); }
       if(id === 'channels') { loadVerificationStats(); loadNotVerifiedUsers(); renderCurrentChannels(); }
+      if(id === 'tasks') { loadTasksList(); loadTaskSubmissions(); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1154,7 +1194,7 @@
     function updateCommissionModeUI(mode) { selectCommissionMode(mode); }
 
     // ===================================================
-    // ✅ NEW: COMMISSION OVERVIEW
+    // ✅ COMMISSION OVERVIEW
     // ===================================================
     async function loadCommissionOverview() {
       try {
@@ -1173,7 +1213,7 @@
     }
 
     // ===================================================
-    // ✅ NEW: USER DETAIL MODAL
+    // ✅ USER DETAIL MODAL
     // ===================================================
     async function showUserDetail(userId) {
       const u = allUsers.find(x => x.id === userId);
@@ -1187,7 +1227,6 @@
       const level = getReferralLevel(refs);
       const sym = configData.currencySymbol || 'TK';
       
-      // Commission history
       const commHist = u.commissionHistory || {};
       const commKeys = Object.keys(commHist).sort((a,b) => (commHist[b].timestamp||0) - (commHist[a].timestamp||0));
       let commHtml = '';
@@ -1246,12 +1285,398 @@
       document.getElementById('userDetailModal').classList.remove('active');
     }
     
-    // Close modal on overlay click
     document.getElementById('userDetailModal').addEventListener('click', (e) => {
       if (e.target.id === 'userDetailModal') closeUserModal();
     });
 
-    // ===== CHANNELS =====
+    // ===================================================
+    // ✅ TASK SUBMISSION MODAL
+    // ===================================================
+    async function showSubmissionDetail(subId) {
+      const sub = currentSubmissions.find(x => x.id === subId);
+      if (!sub) return;
+      
+      const modal = document.getElementById('submissionDetailModal');
+      const body = document.getElementById('submissionModalBody');
+      
+      let inputsHtml = '';
+      if (sub.inputs && Object.keys(sub.inputs).length > 0) {
+        Object.keys(sub.inputs).forEach(key => {
+          inputsHtml += `<div class="row"><span class="key">${key}</span><span class="val">${sub.inputs[key]}</span></div>`;
+        });
+      } else {
+        inputsHtml = '<div class="row"><span class="key">No inputs provided</span></div>';
+      }
+      
+      let imagesHtml = '';
+      if (sub.images && sub.images.length > 0) {
+        sub.images.forEach(img => {
+          imagesHtml += `<div class="image-preview-item">
+            <img src="${img.url}" alt="${img.label}" onerror="this.src='https://via.placeholder.com/150'">
+            <a href="${img.url}" target="_blank" class="overlay"><i class="fas fa-external-link-alt"></i></a>
+            <div style="font-size:0.65rem; padding:4px; text-align:center; background:#fff; font-weight:600; color:#475569; border-top:1px solid #e2e8f0;">${img.label}</div>
+          </div>`;
+        });
+      } else {
+        imagesHtml = '<p style="color:#94a3b8; font-size:0.8rem; font-weight:600;">No images uploaded</p>';
+      }
+      
+      let actionHtml = '';
+      if (sub.status === 'pending' || sub.status === 'processing') {
+        actionHtml = `
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-green" onclick="approveTaskSubmission('${sub.id}', '${sub.userId}', ${sub.reward})" style="flex:2;"><i class="fas fa-check"></i> Approve & Pay</button>
+            <button class="btn btn-red" onclick="cancelTaskSubmission('${sub.id}')" style="flex:1;"><i class="fas fa-times"></i> Cancel</button>
+          </div>
+        `;
+        if (sub.status === 'pending') {
+          actionHtml += `<button class="btn btn-info" onclick="setTaskProcessing('${sub.id}')" style="margin-top:10px;"><i class="fas fa-spinner"></i> Mark as Processing</button>`;
+        }
+      } else {
+        actionHtml = `<div class="alert-box ${sub.status === 'approved' ? 'success' : 'danger'}" style="margin-top:20px;">
+          <i class="fas ${sub.status === 'approved' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+          <div><b>Status:</b> ${sub.status.toUpperCase()} ${sub.reason ? '<br><b>Reason:</b> ' + sub.reason : ''}</div>
+        </div>`;
+      }
+      
+      body.innerHTML = `
+        <div style="background:var(--bg-alt); padding:14px; border-radius:12px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-weight:800; font-size:1rem; color:var(--primary);">${sub.taskTitle}</span>
+            <span class="submission-reward">+${sub.reward} TK</span>
+          </div>
+          <div style="font-size:0.78rem; color:var(--text-secondary); font-weight:600;">User: ${sub.userName} (${sub.userId})</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600; margin-top:4px;">Date: ${new Date(sub.timestamp).toLocaleString()}</div>
+        </div>
+        
+        <div style="font-weight:800; font-size:0.85rem; margin-bottom:8px; color:var(--text);"><i class="fas fa-keyboard"></i> User Inputs</div>
+        <div class="input-data-display">${inputsHtml}</div>
+        
+        <div style="font-weight:800; font-size:0.85rem; margin-bottom:8px; color:var(--text);"><i class="fas fa-image"></i> Uploaded Screenshots</div>
+        <div class="image-preview-grid">${imagesHtml}</div>
+        
+        ${actionHtml}
+      `;
+      
+      modal.classList.add('active');
+    }
+    
+    function closeSubmissionModal() {
+      document.getElementById('submissionDetailModal').classList.remove('active');
+    }
+    
+    document.getElementById('submissionDetailModal').addEventListener('click', (e) => {
+      if (e.target.id === 'submissionDetailModal') closeSubmissionModal();
+    });
+
+    // ===================================================
+    // ✅ TASK MANAGEMENT (NEW SYSTEM)
+    // ===================================================
+    let tempInputs = [];
+    let tempImages = [];
+
+    function renderTaskInputs() {
+      const container = document.getElementById('taskInputsContainer');
+      if (tempInputs.length === 0) {
+        container.innerHTML = '<p style="color:#94a3b8; font-size:0.8rem; margin-bottom:8px;">No input fields added.</p>';
+        return;
+      }
+      let html = '';
+      tempInputs.forEach((inp, i) => {
+        html += `<div class="task-input-row">
+          <input type="text" value="${inp.label}" onchange="tempInputs[${i}].label=this.value" placeholder="Label (e.g., Email Address)">
+          <input type="text" value="${inp.placeholder}" onchange="tempInputs[${i}].placeholder=this.value" placeholder="Placeholder">
+          <button onclick="removeTaskInput(${i})"><i class="fas fa-trash"></i></button>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function addTaskInputField() {
+      tempInputs.push({ label: 'New Input', placeholder: 'Enter here...' });
+      renderTaskInputs();
+    }
+
+    function removeTaskInput(index) {
+      tempInputs.splice(index, 1);
+      renderTaskInputs();
+    }
+
+    function renderTaskImages() {
+      const container = document.getElementById('taskImagesContainer');
+      if (tempImages.length === 0) {
+        container.innerHTML = '<p style="color:#94a3b8; font-size:0.8rem; margin-bottom:8px;">No image fields added.</p>';
+        return;
+      }
+      let html = '';
+      tempImages.forEach((img, i) => {
+        html += `<div class="task-input-row">
+          <input type="text" value="${img.label}" onchange="tempImages[${i}].label=this.value" placeholder="Label (e.g., Gmail Screenshot)">
+          <button onclick="removeTaskImage(${i})"><i class="fas fa-trash"></i></button>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function addTaskImageField() {
+      tempImages.push({ label: 'Screenshot' });
+      renderTaskImages();
+    }
+
+    function removeTaskImage(index) {
+      tempImages.splice(index, 1);
+      renderTaskImages();
+    }
+
+    async function saveNewTask() {
+      const title = document.getElementById('newTaskTitle').value.trim();
+      const category = document.getElementById('newTaskCat').value.trim();
+      const reward = parseFloat(document.getElementById('newTaskReward').value) || 0;
+      const totalSlots = parseInt(document.getElementById('newTaskSlots').value) || 100;
+      const timeLimit = document.getElementById('newTaskTime').value.trim() || '7 days';
+      const description = document.getElementById('newTaskDesc').value.trim();
+
+      if (!title || !category || reward <= 0) return toast('❌ Please fill Title, Category, and Reward!');
+      if (tempInputs.length === 0 && tempImages.length === 0) return toast('❌ Please add at least one Input or Image field!');
+
+      const taskId = 'task_' + Date.now();
+      const taskData = {
+        title, category, reward, totalSlots, timeLimit, description,
+        inputs: tempInputs,
+        images: tempImages,
+        submittedCount: 0,
+        createdAt: Date.now()
+      };
+
+      try {
+        await db.ref('config/newTasks/' + taskId).set(taskData);
+        toast('✅ Task Created Successfully!');
+        // Reset form
+        document.getElementById('newTaskTitle').value = '';
+        document.getElementById('newTaskCat').value = '';
+        document.getElementById('newTaskReward').value = '';
+        document.getElementById('newTaskSlots').value = '';
+        document.getElementById('newTaskTime').value = '';
+        document.getElementById('newTaskDesc').value = '';
+        tempInputs = [];
+        tempImages = [];
+        renderTaskInputs();
+        renderTaskImages();
+        loadTasksList();
+      } catch(e) { toast('❌ Error: ' + e.message); }
+    }
+
+    async function loadTasksList() {
+      const container = document.getElementById('activeTasksList');
+      container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:16px; font-weight:600;">Loading...</p>';
+      try {
+        const snap = await db.ref('config/newTasks').once('value');
+        if (!snap.exists()) {
+          container.innerHTML = '<div class="empty-state"><div class="icon"><i class="fas fa-briefcase"></i></div><p>No tasks created yet</p></div>';
+          return;
+        }
+        let html = '';
+        snap.forEach(child => {
+          const t = child.val();
+          const id = child.key;
+          html += `<div class="task-admin-item">
+            <div class="task-admin-info">
+              <div class="name">${t.title}<span class="reward">+${t.reward} TK</span></div>
+              <div class="url">${t.category} • ${t.submittedCount || 0}/${t.totalSlots || 100} Submitted</div>
+            </div>
+            <button class="btn btn-red btn-small" onclick="deleteNewTask('${id}')"><i class="fas fa-trash"></i></button>
+          </div>`;
+        });
+        container.innerHTML = html;
+      } catch(e) { container.innerHTML = '<p style="color:#ef4444; text-align:center; font-weight:600;">Error loading tasks</p>'; }
+    }
+
+    function deleteNewTask(id) {
+      if(confirm('Delete this task? Users will no longer see it.')) {
+        db.ref('config/newTasks/' + id).remove().then(() => { toast('Task Deleted!'); loadTasksList(); });
+      }
+    }
+
+    async function loadTaskSubmissions() {
+      const container = document.getElementById('taskSubmissionsList');
+      container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:16px; font-weight:600;">Loading...</p>';
+      try {
+        const snap = await db.ref('taskSubmissions').once('value');
+        currentSubmissions = [];
+        snap.forEach(child => {
+          const sub = child.val();
+          sub.id = child.key;
+          currentSubmissions.push(sub);
+        });
+        currentSubmissions.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+        renderSubmissions();
+      } catch(e) { container.innerHTML = '<p style="color:#ef4444; text-align:center; font-weight:600;">Error loading submissions</p>'; }
+    }
+
+    function filterSubmissions(status) {
+      currentFilter = status;
+      // Update active filter button
+      document.querySelectorAll('#tab-tasks .btn-small').forEach(btn => {
+        if(btn.innerText.toLowerCase().includes(status) || (status === 'all' && btn.innerText.toLowerCase().includes('all'))) {
+          btn.style.opacity = '1';
+        } else {
+          btn.style.opacity = '0.6';
+        }
+      });
+      renderSubmissions();
+    }
+
+    function renderSubmissions() {
+      const container = document.getElementById('taskSubmissionsList');
+      let filtered = currentSubmissions;
+      if (currentFilter !== 'all') {
+        filtered = currentSubmissions.filter(s => s.status === currentFilter);
+      }
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon"><i class="fas fa-file-alt"></i></div><p>No submissions found</p></div>';
+        return;
+      }
+      let html = '';
+      filtered.forEach(sub => {
+        let statusClass = 'status-pending';
+        let statusText = '⏳ Pending';
+        if (sub.status === 'processing') { statusClass = 'status-processing'; statusText = '🔄 Processing'; }
+        else if (sub.status === 'approved') { statusClass = 'status-approved'; statusText = '✅ Approved'; }
+        else if (sub.status === 'cancelled') { statusClass = 'status-cancelled'; statusText = '❌ Cancelled'; }
+        
+        html += `<div class="submission-card" onclick="showSubmissionDetail('${sub.id}')">
+          <div class="submission-header">
+            <div>
+              <div class="submission-title">${sub.taskTitle}</div>
+              <div class="submission-user"><i class="fas fa-user"></i> ${sub.userName} (${sub.userId})</div>
+            </div>
+            <div class="submission-reward">+${sub.reward} TK</div>
+          </div>
+          <div class="submission-meta">
+            <i class="fas fa-clock"></i> ${new Date(sub.timestamp).toLocaleString()}
+          </div>
+          <div class="submission-status">
+            <span class="status-badge ${statusClass}">${statusText}</span>
+            <span style="font-size:0.72rem; color:var(--primary); font-weight:700;">Click to review <i class="fas fa-arrow-right"></i></span>
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    async function setTaskProcessing(subId) {
+      try {
+        await db.ref('taskSubmissions/' + subId).update({ status: 'processing' });
+        toast('✅ Marked as Processing');
+        closeSubmissionModal();
+        loadTaskSubmissions();
+      } catch(e) { toast('❌ Error: ' + e.message); }
+    }
+
+    async function approveTaskSubmission(subId, userId, reward) {
+      if(!confirm('Approve this submission and pay ' + reward + ' TK?')) return;
+      try {
+        // 1. Update submission status
+        await db.ref('taskSubmissions/' + subId).update({ status: 'approved' });
+        
+        // 2. Add balance to user
+        const userRef = db.ref('users/' + userId);
+        const snap = await userRef.once('value');
+        if (snap.exists()) {
+          const u = snap.val();
+          await userRef.update({
+            balance: (u.balance || 0) + Number(reward),
+            totalEarned: (u.totalEarned || 0) + Number(reward)
+          });
+        }
+        
+        // 3. Send Notification to User
+        const subSnap = await db.ref('taskSubmissions/' + subId).once('value');
+        const sub = subSnap.val();
+        try {
+          await fetch('https://api.telegram.org/bot' + (configData.botToken || '8072034659:AAE_I05sswA8gBYVOSHtjGEf1LE6i6aq0T8') + '/sendMessage', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              chat_id: userId, 
+              text: `🎉 <b>Task Approved!</b>\n\n📋 Task: ${sub.taskTitle}\n💰 Reward: +${reward} TK\n\nYour balance has been updated.`, 
+              parse_mode: 'HTML' 
+            })
+          });
+        } catch(e) {}
+        
+        toast('✅ Approved & Balance Added!');
+        closeSubmissionModal();
+        loadTaskSubmissions();
+      } catch(e) { toast('❌ Error: ' + e.message); }
+    }
+
+    async function cancelTaskSubmission(subId) {
+      const reason = prompt('Enter cancellation reason (User will see this):');
+      if (reason === null) return; // User clicked cancel
+      if (!reason.trim()) return toast('❌ Reason cannot be empty!');
+      
+      try {
+        await db.ref('taskSubmissions/' + subId).update({ 
+          status: 'cancelled',
+          reason: reason.trim()
+        });
+        
+        // Send Notification to User
+        const subSnap = await db.ref('taskSubmissions/' + subId).once('value');
+        const sub = subSnap.val();
+        try {
+          await fetch('https://api.telegram.org/bot' + (configData.botToken || '8072034659:AAE_I05sswA8gBYVOSHtjGEf1LE6i6aq0T8') + '/sendMessage', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              chat_id: sub.userId, 
+              text: `❌ <b>Task Cancelled</b>\n\n📋 Task: ${sub.taskTitle}\n💬 Reason: ${reason.trim()}\n\nPlease re-submit with correct information.`, 
+              parse_mode: 'HTML' 
+            })
+          });
+        } catch(e) {}
+        
+        toast('✅ Submission Cancelled!');
+        closeSubmissionModal();
+        loadTaskSubmissions();
+      } catch(e) { toast('❌ Error: ' + e.message); }
+    }
+
+    // ===================================================
+    // ✅ ADS MANAGEMENT (UPDATED TO 6 SLOTS)
+    // ===================================================
+    function loadAdsConfig() {
+      let adHtml = '';
+      for(let i=0; i<6; i++) {
+        let slot = configData.adSlots[i] || { network: 'none', id: '' };
+        adHtml += `<div class="ad-slot-box">
+          <div class="ad-slot-header"><i class="fas fa-layer-group"></i> Slot ${i+1}</div>
+          <select id="adNet_${i}" style="margin:8px 0;">
+            <option value="none" ${slot.network==='none'?'selected':''}>Disabled (None)</option>
+            <option value="adsgram" ${slot.network==='adsgram'?'selected':''}>Adsgram</option>
+            <option value="monetag" ${slot.network==='monetag'?'selected':''}>Monetag</option>
+            <option value="gigapub" ${slot.network==='gigapub'?'selected':''}>GigaPub</option>
+          </select>
+          <input type="text" id="adId_${i}" value="${slot.id||''}" placeholder="Block ID / Zone ID">
+        </div>`;
+      }
+      document.getElementById('adsContainer').innerHTML = adHtml;
+    }
+
+    function saveAds() {
+      let slots = [];
+      for(let i=0; i<6; i++) {
+        slots.push({ network: document.getElementById(`adNet_${i}`).value, id: document.getElementById(`adId_${i}`).value });
+      }
+      db.ref('config').update({
+        dailyAdLimit: Number(document.getElementById('dailyAdLimit').value),
+        adReward: Number(document.getElementById('adReward').value),
+        adSlots: slots
+      }).then(() => toast('✅ Ad Settings Saved (6 Slots)!'));
+    }
+
+    // ===================================================
+    // ✅ CHANNELS & SETTINGS (SAME AS BEFORE)
+    // ===================================================
     function renderChannelLinks() {
       const container = document.getElementById('channelLinksContainer');
       if (!channelLinks.length) {
@@ -1384,7 +1809,6 @@
       }
     }
 
-    // ===== WITHDRAW LEVELS =====
     function renderWithdrawLevels() {
       const container = document.getElementById('withdrawLevelsContainer');
       if (!withdrawLevels.length) {
@@ -1442,8 +1866,8 @@
     db.ref('config').on('value', snap => {
       if(snap.exists()) {
         configData = snap.val();
-        if(!configData.adSlots) configData.adSlots = [{},{},{},{}];
-        if(!configData.webTasks) configData.webTasks = {};
+        if(!configData.adSlots) configData.adSlots = [{},{},{},{},{},{}];
+        if(!configData.newTasks) configData.newTasks = {};
         channelLinks = configData.channelLinks || [
           {label:'NexEarn Channel', chatId:'nexearn2'},
           {label:'NexEarn Adda', chatId:'nexearn2_adda'},
@@ -1484,35 +1908,8 @@
           document.getElementById('maintenanceMsg').value = configData.maintenance.message || '';
           document.getElementById('maintenanceTime').value = configData.maintenance.estimatedMinutes || '';
         }
-        let adHtml = '';
-        for(let i=0; i<4; i++) {
-          let slot = configData.adSlots[i] || { network: 'none', id: '' };
-          adHtml += `<div class="ad-slot-box">
-            <div class="ad-slot-header"><i class="fas fa-layer-group"></i> Slot ${i+1}</div>
-            <select id="adNet_${i}" style="margin:8px 0;">
-              <option value="none" ${slot.network==='none'?'selected':''}>Disabled (None)</option>
-              <option value="adsgram" ${slot.network==='adsgram'?'selected':''}>Adsgram</option>
-              <option value="monetag" ${slot.network==='monetag'?'selected':''}>Monetag</option>
-              <option value="gigapub" ${slot.network==='gigapub'?'selected':''}>GigaPub</option>
-            </select>
-            <input type="text" id="adId_${i}" value="${slot.id||''}" placeholder="Block ID / Zone ID">
-          </div>`;
-        }
-        document.getElementById('adsContainer').innerHTML = adHtml;
-        let taskHtml = '';
-        const tasks = configData.webTasks;
-        if(Object.keys(tasks).length === 0) taskHtml = '<p style="font-size:0.85rem; color:#94a3b8; text-align:center; font-weight:600; padding:16px;">No tasks found.</p>';
-        Object.keys(tasks).forEach(k => {
-          let t = tasks[k];
-          taskHtml += `<div class="task-admin-item">
-            <div class="task-admin-info">
-              <div class="name">${t.name}<span class="reward">+${t.reward}</span></div>
-              <div class="url">${t.url}</div>
-            </div>
-            <button class="btn btn-red btn-small" onclick="deleteTask('${k}')"><i class="fas fa-trash"></i></button>
-          </div>`;
-        });
-        document.getElementById('tasksList').innerHTML = taskHtml;
+        loadAdsConfig();
+        loadTasksList();
       }
     });
 
@@ -1541,37 +1938,6 @@
         document.getElementById('minRefBalNote').textContent = MIN_REFERRAL_BALANCE + '+';
         toast('✅ Settings Saved!');
       });
-    }
-
-    function saveAds() {
-      let slots = [];
-      for(let i=0; i<4; i++) {
-        slots.push({ network: document.getElementById(`adNet_${i}`).value, id: document.getElementById(`adId_${i}`).value });
-      }
-      db.ref('config').update({
-        dailyAdLimit: Number(document.getElementById('dailyAdLimit').value),
-        adReward: Number(document.getElementById('adReward').value),
-        adSlots: slots
-      }).then(() => toast('✅ Ad Settings Saved!'));
-    }
-
-    function addTask() {
-      let id = 'task_' + Date.now();
-      let data = {
-        name: document.getElementById('taskName').value,
-        reward: Number(document.getElementById('taskReward').value),
-        url: document.getElementById('taskUrl').value,
-        icon: document.getElementById('taskIcon').value || 'https://via.placeholder.com/45'
-      };
-      if(!data.name || !data.url || !data.reward) return toast('Please fill all fields');
-      db.ref('config/webTasks/' + id).set(data).then(() => {
-        toast('✅ Task Added!');
-        ['taskName','taskReward','taskUrl','taskIcon'].forEach(i => document.getElementById(i).value = '');
-      });
-    }
-
-    function deleteTask(id) {
-      if(confirm('Delete this task?')) db.ref('config/webTasks/' + id).remove().then(() => toast('Task Deleted!'));
     }
 
     function saveMaintenance() {
@@ -1635,7 +2001,6 @@
       filteredUsers.forEach(u => {
         const isBanned = u.isBanned || false;
         const isVerified = u.channelVerified === true;
-        const wdCount = u.withdrawCount || 0;
         const refs = u._qualifiedRefs || 0;
         const level = getReferralLevel(refs);
         const initial = (u.name || 'U').charAt(0).toUpperCase();
