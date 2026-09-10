@@ -6,13 +6,11 @@
   <title>Admin Panel - Earn Wallet</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
   <style>
-    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; }
+    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; --border: #e1e1e1; }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { background: var(--bg); color: var(--text); padding-bottom: 30px; }
     
@@ -20,7 +18,7 @@
     .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
     
     .tabs { display: flex; overflow-x: auto; background: var(--surface); border-radius: 15px; padding: 5px; gap: 5px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-    .tab { flex: 1; text-align: center; padding: 12px 10px; font-weight: 700; color: #888; cursor: pointer; border-radius: 10px; white-space: nowrap; transition: 0.3s; font-size: 0.8rem;}
+    .tab { flex: 1; text-align: center; padding: 12px 10px; font-weight: 700; color: #888; cursor: pointer; border-radius: 10px; white-space: nowrap; transition: 0.3s; font-size: 0.8rem; min-width: 70px;}
     .tab.active { background: rgba(108,92,231,0.1); color: var(--primary); }
 
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
@@ -40,6 +38,7 @@
     .btn-green { background: linear-gradient(135deg, #00b894, #00cec9); }
     .btn-red { background: linear-gradient(135deg, #ff4757, #ff6b81); }
     .btn-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+    .btn-info { background: linear-gradient(135deg, #0984e3, #74b9ff); }
     .btn-small { width: auto; padding: 10px 15px; font-size: 0.85rem; border-radius: 8px;}
     
     .wd-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
@@ -47,20 +46,26 @@
     .wd-info { font-size: 0.9rem; color: #555; margin-bottom: 15px; line-height: 1.6; }
     .wd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     
-    .user-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .user-info { flex: 1; min-width: 150px; }
+    .user-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+    .user-info { flex: 1; min-width: 150px; margin-bottom: 10px;}
     .user-info .name { font-weight: 700; font-size: 1rem; }
     .user-info .id { font-size: 0.8rem; color: #999; }
     .user-info .bal { font-weight: 800; color: var(--primary); }
     .user-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .user-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .user-stat-mini { background: #f7f7fb; padding: 6px 4px; border-radius: 8px; text-align: center; font-size: 0.7rem; font-weight: 700; color: #555;}
+    .user-stat-mini .val { font-size: 0.9rem; font-weight: 900; color: var(--primary); display: block;}
+    .user-stat-mini.green .val { color: var(--success); }
+    .user-stat-mini.red .val { color: var(--danger); }
     
-    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #2d3436; color: #fff; padding: 12px 25px; border-radius: 30px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; font-weight: 600;}
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #2d3436; color: #fff; padding: 12px 25px; border-radius: 30px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; font-weight: 600; max-width: 90%; text-align: center;}
     .toast.show { opacity: 1; top: 30px; }
 
     .status-badge { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
     .status-badge.active { background: rgba(0,184,148,0.15); color: var(--success); }
     .status-badge.banned { background: rgba(255,71,87,0.15); color: var(--danger); }
-    .status-badge.maintenance { background: rgba(243,156,18,0.15); color: var(--warning); }
+    .status-badge.verified { background: rgba(0,184,148,0.15); color: var(--success); }
+    .status-badge.notverified { background: rgba(255,71,87,0.15); color: var(--danger); }
 
     .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
     .search-box input { flex: 1; }
@@ -83,94 +88,38 @@
     .ref-level-badge.gold { background: rgba(255,215,0,0.25); color: #b8860b; }
     .ref-level-badge.platinum { background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(162,155,254,0.2)); color: var(--primary); }
 
-    .level-edit-item {
-        background: #f9f9f9;
-        padding: 12px;
-        border-radius: 10px;
-        border: 1px solid #e1e1e1;
-        margin-bottom: 10px;
-    }
-    .level-edit-item .level-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-    }
-    .level-edit-item .level-header .level-num {
-        font-weight: 700;
-        color: var(--primary);
-        font-size: 0.9rem;
-    }
-    .level-edit-item .level-fields {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-    .level-edit-item .level-fields input {
-        padding: 6px 10px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        background: #fff;
-        width: 70px;
-    }
-    .level-edit-item .level-fields input.wide {
-        width: 100px;
-    }
+    .level-edit-item { background: #f9f9f9; padding: 12px; border-radius: 10px; border: 1px solid #e1e1e1; margin-bottom: 10px; }
+    .level-edit-item .level-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .level-edit-item .level-header .level-num { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
+    .level-edit-item .level-fields { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .level-edit-item .level-fields input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; background: #fff; width: 70px; }
+    .level-edit-item .level-fields input.wide { width: 100px; }
 
-    /* ====== NEW: Analytics Stats Cards ====== */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 15px;
-    }
-    .stat-card {
-        background: var(--bg);
-        padding: 15px;
-        border-radius: 15px;
-        text-align: center;
-        border: 1px solid var(--border);
-    }
-    .stat-card .num {
-        font-size: 1.8rem;
-        font-weight: 900;
-        color: var(--primary);
-        line-height: 1.2;
-    }
-    .stat-card .label {
-        font-size: 0.7rem;
-        color: #888;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+    /* Analytics */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+    .stat-card { background: var(--bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
+    .stat-card .num { font-size: 1.8rem; font-weight: 900; color: var(--primary); line-height: 1.2; }
+    .stat-card .label { font-size: 0.7rem; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-card.green .num { color: var(--success); }
     .stat-card.warning .num { color: var(--warning); }
     .stat-card.danger .num { color: var(--danger); }
     
-    .activity-table {
-        width: 100%;
-        font-size: 0.85rem;
-        border-collapse: collapse;
-    }
-    .activity-table th {
-        text-align: left;
-        padding: 8px 6px;
-        border-bottom: 2px solid #eee;
-        font-weight: 700;
-        color: #555;
-    }
-    .activity-table td {
-        padding: 8px 6px;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    .activity-table tr:hover { background: rgba(108,92,231,0.03); }
+    .activity-table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
+    .activity-table th { text-align: left; padding: 8px 6px; border-bottom: 2px solid #eee; font-weight: 700; color: #555; }
+    .activity-table td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; }
     .activity-table .user-id { font-weight: 600; color: var(--primary); }
-    .activity-table .click-rate { font-weight: 600; }
-    .activity-table .click-rate.high { color: var(--success); }
-    .activity-table .click-rate.low { color: var(--danger); }
+
+    /* Warning/Info Boxes */
+    .alert-box { padding: 12px 14px; border-radius: 12px; font-size: 0.82rem; font-weight: 600; margin-bottom: 12px; line-height: 1.5; display: flex; align-items: flex-start; gap: 10px;}
+    .alert-box i { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px;}
+    .alert-box.warning { background: rgba(243,156,18,0.1); border: 1px dashed rgba(243,156,18,0.4); color: #b9770e; }
+    .alert-box.info { background: rgba(9,132,227,0.08); border: 1px dashed rgba(9,132,227,0.3); color: #0984e3; }
+    .alert-box.success { background: rgba(0,184,148,0.1); border: 1px dashed rgba(0,184,148,0.4); color: #0e7a61; }
+    
+    .channel-verified-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f9f9f9; border-radius: 10px; margin-bottom: 6px; font-size: 0.85rem; border: 1px solid #e1e1e1;}
+    .channel-verified-item i { color: var(--primary); }
+    .channel-verified-item .ch-name { flex: 1; font-weight: 700; }
+    .channel-verified-item .ch-id { font-size: 0.75rem; color: #888; }
   </style>
 </head>
 <body>
@@ -179,8 +128,9 @@
 
   <div class="container">
     <div class="tabs">
-      <div class="tab" onclick="switchTab('analytics', this)"><i class="fas fa-chart-bar"></i> Analytics</div>
       <div class="tab active" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> General</div>
+      <div class="tab" onclick="switchTab('channels', this)"><i class="fas fa-link"></i> Channels</div>
+      <div class="tab" onclick="switchTab('analytics', this)"><i class="fas fa-chart-bar"></i> Analytics</div>
       <div class="tab" onclick="switchTab('users', this)"><i class="fas fa-users"></i> Users</div>
       <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-wallet"></i> Payouts</div>
       <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-ad"></i> Ads & Tasks</div>
@@ -188,31 +138,8 @@
       <div class="tab" onclick="switchTab('referrals', this)"><i class="fas fa-user-plus"></i> Referrals</div>
     </div>
 
-    <!-- ================= ANALYTICS TAB (NEW) ================= -->
-    <div id="tab-analytics" class="tab-content">
-      <div class="card">
-        <h3><i class="fas fa-chart-line"></i> Ad Activity Overview</h3>
-        <div class="stats-grid" id="analyticsStats">
-          <div class="stat-card"><div class="num" id="totalUsers">0</div><div class="label">Active Users</div></div>
-          <div class="stat-card green"><div class="num" id="totalAdViews">0</div><div class="label">Total Ad Views</div></div>
-          <div class="stat-card warning"><div class="num" id="totalAdClicks">0</div><div class="label">Total Ad Clicks</div></div>
-          <div class="stat-card danger"><div class="num" id="avgClickRate">0%</div><div class="label">Avg Click Rate</div></div>
-        </div>
-        <div style="overflow-x:auto;">
-          <table class="activity-table">
-            <thead><tr><th>User</th><th>Views</th><th>Clicks</th><th>Click Rate</th><th>Last Active</th></tr></thead>
-            <tbody id="analyticsTableBody">
-              <tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">Loading data...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <button class="btn btn-small btn-info" onclick="refreshAnalytics()" style="width:auto; margin-top:10px;"><i class="fas fa-sync"></i> Refresh</button>
-      </div>
-    </div>
-
-    <!-- ================= SETTINGS TAB (unchanged) ================= -->
+    <!-- ================= SETTINGS TAB ================= -->
     <div id="tab-settings" class="tab-content active">
-      <!-- All previous settings cards remain exactly the same -->
       <div class="card">
         <h3><i class="fas fa-robot"></i> App Details</h3>
         <div class="form-group"><label>Bot Username (Without @)</label><input type="text" id="botUsername" placeholder="your_bot"></div>
@@ -223,19 +150,13 @@
         </div>
       </div>
       <div class="card">
-        <h3><i class="fas fa-link"></i> Channel Links for Verification</h3>
-        <p style="font-size:0.8rem; color:#888; margin-bottom:12px;">Users must join all channels to access the app. Add or remove channels below.</p>
-        <div id="channelLinksContainer"></div>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <input type="text" id="newChannelLabel" placeholder="Channel Name" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
-          <input type="text" id="newChannelId" placeholder="Chat ID/Username" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
-          <button class="btn btn-green btn-small" onclick="addChannelLink()"><i class="fas fa-plus"></i> Add</button>
-        </div>
-      </div>
-      <div class="card">
         <h3><i class="fas fa-gift"></i> Referral & Bonus</h3>
         <div class="form-group"><label>Daily Login Bonus (Amount)</label><input type="number" id="dailyBonusAmount" placeholder="20"></div>
         <div class="form-group"><label>Bonus Per Referral</label><input type="number" id="refBonus" placeholder="5"></div>
+        <div class="form-group"><label>Minimum Referral Balance Requirement</label>
+          <input type="number" id="minReferralBalance" placeholder="20" value="20">
+          <small style="font-size:0.7rem; color:#888;">Referral will count as "valid" only if referred user has this much balance</small>
+        </div>
         <div class="form-group"><label>Referral Levels (Auto-generated)</label>
           <div style="background:#f9f9f9; padding:12px; border-radius:10px; font-size:0.85rem; color:#555; border:1px solid #eee;">
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; font-weight:700; border-bottom:1px solid #ddd; padding-bottom:5px; margin-bottom:5px;">
@@ -266,7 +187,76 @@
       <button class="btn" onclick="saveSettings()"><i class="fas fa-save"></i> Save General Settings</button>
     </div>
 
-    <!-- ================= USERS TAB (unchanged) ================= -->
+    <!-- ================= CHANNELS TAB (ENHANCED) ================= -->
+    <div id="tab-channels" class="tab-content">
+      <div class="card">
+        <h3><i class="fas fa-link"></i> Channel Links for Verification</h3>
+        <div class="alert-box info">
+          <i class="fas fa-info-circle"></i>
+          <div>ইউজারদের অবশ্যই সব চ্যানেলে জয়েন করতে হবে। চ্যানেল পরিবর্তন করলে ইউজারদের আবার ভেরিফাই করতে হবে।</div>
+        </div>
+        <div id="channelLinksContainer"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <input type="text" id="newChannelLabel" placeholder="Channel Name" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
+          <input type="text" id="newChannelId" placeholder="Chat ID/Username" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
+          <button class="btn btn-green btn-small" onclick="addChannelLink()"><i class="fas fa-plus"></i> Add</button>
+        </div>
+        <button class="btn" onclick="saveChannelsAndForceReverify()" style="margin-top:15px; background: linear-gradient(135deg, #f39c12, #e67e22);">
+          <i class="fas fa-save"></i> Save Channels & Force Re-Verify All Users
+        </button>
+        <div class="alert-box warning" style="margin-top:12px;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div><b>Force Re-Verify:</b> এই বাটনে ক্লিক করলে সব ইউজারের <code>channelVerified</code> স্ট্যাটাস <code>false</code> হয়ে যাবে এবং তারা পরের বার অ্যাপ খুললে আবার সব চ্যানেলে জয়েন করতে হবে।</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-users-check"></i> Verification Stats</h3>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="num" id="totalVerifiedUsers">0</div><div class="label">Verified Users</div></div>
+          <div class="stat-card danger"><div class="num" id="totalNotVerifiedUsers">0</div><div class="label">Not Verified</div></div>
+        </div>
+        <button class="btn btn-small btn-info" onclick="loadVerificationStats()" style="width:auto;"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-list"></i> Current Channels</h3>
+        <div id="currentChannelsList"></div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-user-slash"></i> Not-Verified Users (Top 20)</h3>
+        <div class="alert-box warning">
+          <i class="fas fa-info-circle"></i>
+          <div>এই ইউজাররা বর্তমানে সব চ্যানেলে জয়েন না থাকায় অ্যাপে ঢুকতে পারছেন না।</div>
+        </div>
+        <div id="notVerifiedUsersList">Loading...</div>
+      </div>
+    </div>
+
+    <!-- ================= ANALYTICS TAB ================= -->
+    <div id="tab-analytics" class="tab-content">
+      <div class="card">
+        <h3><i class="fas fa-chart-line"></i> Ad Activity Overview</h3>
+        <div class="stats-grid" id="analyticsStats">
+          <div class="stat-card"><div class="num" id="totalUsers">0</div><div class="label">Total Users</div></div>
+          <div class="stat-card green"><div class="num" id="totalAdViews">0</div><div class="label">Total Ad Views</div></div>
+          <div class="stat-card warning"><div class="num" id="totalAdClicks">0</div><div class="label">Total Ad Clicks</div></div>
+          <div class="stat-card danger"><div class="num" id="avgClickRate">0%</div><div class="label">Avg Click Rate</div></div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="activity-table">
+            <thead><tr><th>User</th><th>Views</th><th>Clicks</th><th>Click Rate</th><th>Last Active</th></tr></thead>
+            <tbody id="analyticsTableBody">
+              <tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">Loading data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-small btn-info" onclick="refreshAnalytics()" style="width:auto; margin-top:10px;"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+    </div>
+
+    <!-- ================= USERS TAB (ENHANCED) ================= -->
     <div id="tab-users" class="tab-content">
       <div class="card">
         <h3><i class="fas fa-users"></i> All Users</h3>
@@ -278,7 +268,7 @@
       </div>
     </div>
 
-    <!-- ================= WITHDRAWALS TAB (unchanged) ================= -->
+    <!-- ================= WITHDRAWALS TAB ================= -->
     <div id="tab-withdrawals" class="tab-content">
       <div class="card">
         <h3><i class="fas fa-hourglass-half"></i> Pending Requests</h3>
@@ -290,7 +280,7 @@
       </div>
     </div>
 
-    <!-- ================= ADS & TASKS TAB (unchanged) ================= -->
+    <!-- ================= ADS & TASKS TAB ================= -->
     <div id="tab-ads" class="tab-content">
       <div class="card">
         <h3><i class="fas fa-bullhorn"></i> Ad Networks Config</h3>
@@ -313,7 +303,7 @@
       </div>
     </div>
 
-    <!-- ================= MAINTENANCE TAB (unchanged) ================= -->
+    <!-- ================= MAINTENANCE TAB ================= -->
     <div id="tab-maintenance" class="tab-content">
       <div class="card">
         <h3><i class="fas fa-tools"></i> System Maintenance</h3>
@@ -324,22 +314,20 @@
             <option value="true">🔴 Maintenance Mode</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Maintenance Message</label>
-          <input type="text" id="maintenanceMsg" placeholder="We're updating our system...">
-        </div>
-        <div class="form-group">
-          <label>Estimated Time (Minutes)</label>
-          <input type="number" id="maintenanceTime" placeholder="30">
-        </div>
+        <div class="form-group"><label>Maintenance Message</label><input type="text" id="maintenanceMsg" placeholder="We're updating our system..."></div>
+        <div class="form-group"><label>Estimated Time (Minutes)</label><input type="number" id="maintenanceTime" placeholder="30"></div>
         <button class="btn btn-warning" onclick="saveMaintenance()"><i class="fas fa-save"></i> Update Maintenance</button>
       </div>
     </div>
 
-    <!-- ================= REFERRALS TAB (unchanged) ================= -->
+    <!-- ================= REFERRALS TAB (ENHANCED) ================= -->
     <div id="tab-referrals" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-trophy"></i> Top Referrers</h3>
+        <h3><i class="fas fa-trophy"></i> Top Referrers (Qualified)</h3>
+        <div class="alert-box success">
+          <i class="fas fa-check-circle"></i>
+          <div>শুধুমাত্র <b id="minRefBalNote">20+</b> TK ব্যালেন্স আছে এমন ইউজারদের qualified referral হিসেবে গোনা হচ্ছে।</div>
+        </div>
         <div id="adminRefLeaderboard">
           <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
         </div>
@@ -347,6 +335,12 @@
       <div class="card">
         <h3><i class="fas fa-users"></i> All Referral Stats</h3>
         <div id="adminRefStats">
+          <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-list"></i> Referral Details (Recent)</h3>
+        <div id="referralDetailsList">
           <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
         </div>
       </div>
@@ -376,10 +370,8 @@
     let filteredUsers = [];
     let channelLinks = [];
     let withdrawLevels = [];
+    let MIN_REFERRAL_BALANCE = 20;
 
-    // ===================================================
-    // ✅ REFERRAL LEVELS
-    // ===================================================
     const REFERRAL_LEVELS = {
       BEGINNER: { min: 0, label: '⭐ BEGINNER', class: 'beginner' },
       BRONZE: { min: 5, label: '🥉 BRONZE', class: 'bronze' },
@@ -399,7 +391,7 @@
     function toast(msg) {
       const t = document.getElementById('toast');
       t.innerText = msg; t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
+      setTimeout(() => t.classList.remove('show'), 3000);
     }
 
     function switchTab(id, el) {
@@ -411,102 +403,178 @@
       if(id === 'withdrawals') loadAllWithdrawals();
       if(id === 'referrals') loadReferralStats();
       if(id === 'analytics') loadAnalytics();
+      if(id === 'channels') { loadVerificationStats(); loadNotVerifiedUsers(); renderCurrentChannels(); }
     }
 
     // ===================================================
-    // ✅ ANALYTICS – USER ACTIVITY TRACKING (NEW)
+    // ✅ CHANNEL LINKS MANAGEMENT
     // ===================================================
-    async function loadAnalytics() {
+    function renderChannelLinks() {
+      const container = document.getElementById('channelLinksContainer');
+      if (!channelLinks.length) {
+        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px;">No channels added yet.</p>';
+        return;
+      }
+      let html = '';
+      channelLinks.forEach((link, index) => {
+        html += `
+          <div class="channel-item">
+            <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
+            <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
+            <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderCurrentChannels() {
+      const container = document.getElementById('currentChannelsList');
+      if (!channelLinks.length) {
+        container.innerHTML = '<p style="color:#999; text-align:center;">No channels configured.</p>';
+        return;
+      }
+      let html = '';
+      channelLinks.forEach(link => {
+        html += `<div class="channel-verified-item">
+          <i class="fa-brands fa-telegram"></i>
+          <div class="ch-name">${link.label}</div>
+          <div class="ch-id">@${link.chatId}</div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function addChannelLink() {
+      const label = document.getElementById('newChannelLabel').value.trim();
+      const chatId = document.getElementById('newChannelId').value.trim();
+      if (!label || !chatId) return toast('Please enter both label and chat ID');
+      channelLinks.push({ label, chatId });
+      renderChannelLinks();
+      document.getElementById('newChannelLabel').value = '';
+      document.getElementById('newChannelId').value = '';
+      toast('Channel added! Click "Save Channels" to apply.');
+    }
+
+    function removeChannelLink(index) {
+      channelLinks.splice(index, 1);
+      renderChannelLinks();
+      toast('Channel removed! Click "Save Channels" to apply.');
+    }
+
+    // ✅ NEW: Save channels + force re-verify all users
+    async function saveChannelsAndForceReverify() {
+      if (!confirm('⚠️ This will save channels AND force re-verification for ALL users. Continue?')) return;
+      
+      // Collect channel data from UI
+      const newChannelLinks = [];
+      channelLinks.forEach((link, index) => {
+        const labelEl = document.getElementById(`channelLabel_${index}`);
+        const chatIdEl = document.getElementById(`channelId_${index}`);
+        if (labelEl && chatIdEl && labelEl.value.trim() && chatIdEl.value.trim()) {
+          newChannelLinks.push({ label: labelEl.value.trim(), chatId: chatIdEl.value.trim() });
+        }
+      });
+      
+      if (newChannelLinks.length === 0) {
+        toast('❌ No channels to save!');
+        return;
+      }
+      
       try {
+        toast('⏳ Saving channels...');
+        
+        // 1. Save channels to config
+        await db.ref('config/channelLinks').set(newChannelLinks);
+        channelLinks = newChannelLinks;
+        
+        // 2. Force re-verify all users: set channelVerified = false, clear verifiedChannels
+        toast('⏳ Force re-verifying users...');
+        
         const usersSnap = await db.ref('users').once('value');
-        let userData = [];
-        let totalViews = 0;
-        let totalClicks = 0;
-        let activeUsers = 0;
-        const today = new Date().toISOString().slice(0, 10);
-
-        if (usersSnap.exists()) {
-          usersSnap.forEach(child => {
-            const u = child.val();
-            const id = child.key;
-            const dailyAds = u.dailyAds || {};
-            // Count views: sum of all dailyAd slots
-            let views = 0;
-            for (let key in dailyAds) {
-              views += Number(dailyAds[key]) || 0;
-            }
-            // Clicks: stored in adClicks field (if exists)
-            const clicks = u.adClicks || 0;
-            // Last active date
-            const lastActive = u.lastActive || 'Never';
-            // Check if user was active today
-            if (lastActive === today) activeUsers++;
-            
-            totalViews += views;
-            totalClicks += clicks;
-            
-            userData.push({
-              id: id,
-              name: u.name || 'User',
-              views: views,
-              clicks: clicks,
-              lastActive: lastActive
-            });
-          });
-        }
-
-        // Sort by views descending
-        userData.sort((a, b) => b.views - a.views);
-
-        // Update stats cards
-        document.getElementById('totalUsers').textContent = usersSnap.exists() ? usersSnap.numChildren() : 0;
-        document.getElementById('totalAdViews').textContent = totalViews;
-        document.getElementById('totalAdClicks').textContent = totalClicks;
-        const clickRate = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : 0;
-        document.getElementById('avgClickRate').textContent = clickRate + '%';
-
-        // Build table
-        const tbody = document.getElementById('analyticsTableBody');
-        if (userData.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No user activity data yet.</td></tr>';
-          return;
-        }
-
-        let html = '';
-        userData.forEach(u => {
-          const rate = u.views > 0 ? ((u.clicks / u.views) * 100).toFixed(1) : 0;
-          const rateClass = rate >= 30 ? 'high' : (rate >= 10 ? '' : 'low');
-          const lastActiveStr = u.lastActive === today ? '🟢 Today' : u.lastActive;
-          html += `
-            <tr>
-              <td class="user-id">${u.name}<br><span style="font-size:0.7rem; color:#999;">${u.id}</span></td>
-              <td><strong>${u.views}</strong></td>
-              <td><strong>${u.clicks}</strong></td>
-              <td><span class="click-rate ${rateClass}">${rate}%</span></td>
-              <td style="font-size:0.75rem;">${lastActiveStr}</td>
-            </tr>
-          `;
+        const updates = {};
+        let count = 0;
+        
+        usersSnap.forEach(child => {
+          updates[child.key + '/channelVerified'] = false;
+          updates[child.key + '/verifiedChannels'] = null;
+          count++;
         });
-        tbody.innerHTML = html;
-
-      } catch (e) {
-        console.error('Analytics error:', e);
-        document.getElementById('analyticsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger);">Error loading analytics</td></tr>';
+        
+        if (count > 0) {
+          await db.ref('users').update(updates);
+        }
+        
+        toast(`✅ Saved! ${count} users will re-verify on next open.`);
+        loadVerificationStats();
+        loadNotVerifiedUsers();
+        renderCurrentChannels();
+      } catch(e) {
+        console.error(e);
+        toast('❌ Error: ' + e.message);
       }
     }
 
-    function refreshAnalytics() {
-      toast('Refreshing analytics...');
-      loadAnalytics();
+    // ===================================================
+    // ✅ VERIFICATION STATS
+    // ===================================================
+    async function loadVerificationStats() {
+      try {
+        const snap = await db.ref('users').once('value');
+        let verified = 0, notVerified = 0;
+        snap.forEach(child => {
+          const u = child.val();
+          if (u.channelVerified === true) verified++;
+          else notVerified++;
+        });
+        document.getElementById('totalVerifiedUsers').textContent = verified;
+        document.getElementById('totalNotVerifiedUsers').textContent = notVerified;
+      } catch(e) { console.error(e); }
+    }
+
+    async function loadNotVerifiedUsers() {
+      const container = document.getElementById('notVerifiedUsersList');
+      container.innerHTML = '<p style="text-align:center; color:#999; padding:15px;">Loading...</p>';
+      try {
+        const snap = await db.ref('users').once('value');
+        let list = [];
+        snap.forEach(child => {
+          const u = child.val();
+          if (u.channelVerified !== true) {
+            list.push({ id: child.key, name: u.name || 'User', lastActive: u.lastActive || 'Never' });
+          }
+        });
+        list.sort((a,b) => (b.lastActive > a.lastActive ? 1 : -1));
+        if (list.length === 0) {
+          container.innerHTML = '<div class="alert-box success"><i class="fas fa-check-circle"></i><div>সব ইউজার verified! ✅</div></div>';
+          return;
+        }
+        let html = '';
+        list.slice(0, 20).forEach(u => {
+          html += `<div style="display:flex; justify-content:space-between; padding:10px 12px; background:#fff8f8; border:1px solid #ffe0e0; border-radius:10px; margin-bottom:8px;">
+            <div>
+              <div style="font-weight:700; font-size:0.85rem;">${u.name}</div>
+              <div style="font-size:0.7rem; color:#999;">ID: ${u.id}</div>
+            </div>
+            <div style="font-size:0.7rem; color:#888;">Last: ${u.lastActive}</div>
+          </div>`;
+        });
+        if (list.length > 20) {
+          html += `<p style="text-align:center; color:#888; font-size:0.8rem;">+ ${list.length - 20} more...</p>`;
+        }
+        container.innerHTML = html;
+      } catch(e) {
+        container.innerHTML = '<p style="text-align:center; color:#e74c3c;">Error loading</p>';
+      }
     }
 
     // ===================================================
-    // ✅ WITHDRAW LEVELS MANAGEMENT (unchanged)
+    // ✅ WITHDRAW LEVELS
     // ===================================================
     function renderWithdrawLevels() {
       const container = document.getElementById('withdrawLevelsContainer');
       if (!withdrawLevels.length) {
-        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px; font-size:0.85rem;">No levels configured. Add a level below.</p>';
+        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px; font-size:0.85rem;">No levels configured.</p>';
         return;
       }
       let html = '';
@@ -531,22 +599,13 @@
     }
 
     function addWithdrawLevel() {
-      withdrawLevels.push({
-        requiredRefs: 5,
-        fee: 5,
-        minAmount: 10,
-        maxAmount: 100,
-        time: "24-48 Hours"
-      });
+      withdrawLevels.push({ requiredRefs: 5, fee: 5, minAmount: 10, maxAmount: 100, time: "30 Min-1 Hours" });
       renderWithdrawLevels();
       toast('Level added! Save settings to apply.');
     }
 
     function removeWithdrawLevel(index) {
-      if (withdrawLevels.length <= 1) {
-        toast('Cannot remove last level!');
-        return;
-      }
+      if (withdrawLevels.length <= 1) { toast('Cannot remove last level!'); return; }
       if(confirm('Remove this level?')) {
         withdrawLevels.splice(index, 1);
         renderWithdrawLevels();
@@ -561,53 +620,14 @@
         const fee = parseFloat(document.getElementById(`wl_fee_${index}`).value) || 5;
         const minAmt = parseFloat(document.getElementById(`wl_min_${index}`).value) || 10;
         const maxAmt = parseFloat(document.getElementById(`wl_max_${index}`).value) || 100;
-        const time = document.getElementById(`wl_time_${index}`).value || "24-48 Hours";
+        const time = document.getElementById(`wl_time_${index}`).value || "30 Min-1 Hours";
         levels.push({ requiredRefs: refs, fee: fee, minAmount: minAmt, maxAmount: maxAmt, time: time });
       });
       return levels;
     }
 
     // ===================================================
-    // ✅ CHANNEL LINKS MANAGEMENT (unchanged)
-    // ===================================================
-    function renderChannelLinks() {
-      const container = document.getElementById('channelLinksContainer');
-      if (!channelLinks.length) {
-        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px;">No channels added yet.</p>';
-        return;
-      }
-      let html = '';
-      channelLinks.forEach((link, index) => {
-        html += `
-          <div class="channel-item">
-            <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
-            <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
-            <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})"><i class="fas fa-trash"></i></button>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
-
-    function addChannelLink() {
-      const label = document.getElementById('newChannelLabel').value.trim();
-      const chatId = document.getElementById('newChannelId').value.trim();
-      if (!label || !chatId) return toast('Please enter both label and chat ID');
-      channelLinks.push({ label, chatId });
-      renderChannelLinks();
-      document.getElementById('newChannelLabel').value = '';
-      document.getElementById('newChannelId').value = '';
-      toast('Channel added! Save settings to apply.');
-    }
-
-    function removeChannelLink(index) {
-      channelLinks.splice(index, 1);
-      renderChannelLinks();
-      toast('Channel removed! Save settings to apply.');
-    }
-
-    // ===================================================
-    // ✅ READ CONFIG (unchanged)
+    // ✅ READ CONFIG
     // ===================================================
     db.ref('config').on('value', snap => {
       if(snap.exists()) {
@@ -617,16 +637,18 @@
         
         channelLinks = configData.channelLinks || [
           {label:'NexEarn Channel', chatId:'nexearn2'},
-          {label:'NexEarn Adda', chatId:'nexearn2_adda'}
+          {label:'NexEarn Adda', chatId:'nexearn2_adda'},
+          {label:'NexEarn Official', chatId:'nexearn2_official'},
+          {label:'NexEarn Payment', chatId:'nexearn2_payment'}
         ];
         renderChannelLinks();
         
         withdrawLevels = configData.withdrawLevels || [
-          { requiredRefs: 5, fee: 5, minAmount: 10, maxAmount: 100, time: "24-48 Hours" },
-          { requiredRefs: 7, fee: 4, minAmount: 10, maxAmount: 200, time: "24-48 Hours" },
-          { requiredRefs: 7, fee: 3, minAmount: 10, maxAmount: 300, time: "12-24 Hours" },
-          { requiredRefs: 7, fee: 2, minAmount: 10, maxAmount: 400, time: "12-24 Hours" },
-          { requiredRefs: 7, fee: 1, minAmount: 10, maxAmount: 500, time: "6-12 Hours" }
+          { requiredRefs: 5, fee: 5, minAmount: 10, maxAmount: 100, time: "30 Min-1 Hours" },
+          { requiredRefs: 7, fee: 4, minAmount: 10, maxAmount: 200, time: "30 Min-1 Hours" },
+          { requiredRefs: 7, fee: 3, minAmount: 10, maxAmount: 300, time: "30 Min-1 Hours" },
+          { requiredRefs: 7, fee: 2, minAmount: 10, maxAmount: 400, time: "30 Min-1 Hours" },
+          { requiredRefs: 7, fee: 1, minAmount: 10, maxAmount: 500, time: "30 Min-1 Hours" }
         ];
         renderWithdrawLevels();
         
@@ -634,6 +656,9 @@
         document.getElementById('currencySymbol').value = configData.currencySymbol || 'TK';
         document.getElementById('dailyBonusAmount').value = configData.dailyBonusAmount || 20;
         document.getElementById('refBonus').value = configData.refBonus || 5;
+        document.getElementById('minReferralBalance').value = configData.minReferralBalance || 20;
+        MIN_REFERRAL_BALANCE = configData.minReferralBalance || 20;
+        document.getElementById('minRefBalNote').textContent = MIN_REFERRAL_BALANCE + '+';
         document.getElementById('tutorialLink').value = configData.tutorialLink || '';
         document.getElementById('supportLink').value = configData.supportLink || '';
         document.getElementById('minWithdraw').value = configData.minWithdraw || 10;
@@ -686,20 +711,10 @@
     });
 
     // ===================================================
-    // ✅ SAVE SETTINGS (unchanged)
+    // ✅ SAVE SETTINGS
     // ===================================================
     function saveSettings() {
       let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
-      
-      const newChannelLinks = [];
-      channelLinks.forEach((link, index) => {
-        const label = document.getElementById(`channelLabel_${index}`);
-        const chatId = document.getElementById(`channelId_${index}`);
-        if (label && chatId) {
-          newChannelLinks.push({ label: label.value, chatId: chatId.value });
-        }
-      });
-      
       const levels = getWithdrawLevelsFromUI();
       
       db.ref('config').update({
@@ -707,31 +722,26 @@
         currencySymbol: document.getElementById('currencySymbol').value,
         dailyBonusAmount: Number(document.getElementById('dailyBonusAmount').value),
         refBonus: Number(document.getElementById('refBonus').value),
+        minReferralBalance: Number(document.getElementById('minReferralBalance').value) || 20,
         tutorialLink: document.getElementById('tutorialLink').value,
         supportLink: document.getElementById('supportLink').value,
         minWithdraw: Number(document.getElementById('minWithdraw').value),
         withdrawNotice: document.getElementById('withdrawNotice').value,
         paymentMethods: methods,
-        channelLinks: newChannelLinks,
         withdrawLevels: levels,
         adResetHour: Number(document.getElementById('adResetHour').value) || 0
       }).then(() => {
-        channelLinks = newChannelLinks;
         withdrawLevels = levels;
+        MIN_REFERRAL_BALANCE = Number(document.getElementById('minReferralBalance').value) || 20;
+        document.getElementById('minRefBalNote').textContent = MIN_REFERRAL_BALANCE + '+';
         toast('Settings Saved Successfully!');
       });
     }
 
-    // ===================================================
-    // ✅ SAVE ADS (unchanged)
-    // ===================================================
     function saveAds() {
       let slots = [];
       for(let i=0; i<4; i++) {
-        slots.push({
-          network: document.getElementById(`adNet_${i}`).value,
-          id: document.getElementById(`adId_${i}`).value
-        });
+        slots.push({ network: document.getElementById(`adNet_${i}`).value, id: document.getElementById(`adId_${i}`).value });
       }
       db.ref('config').update({
         dailyAdLimit: Number(document.getElementById('dailyAdLimit').value),
@@ -740,9 +750,6 @@
       }).then(() => toast('Ad Settings Saved!'));
     }
 
-    // ===================================================
-    // ✅ TASKS (unchanged)
-    // ===================================================
     function addTask() {
       let id = 'task_' + Date.now();
       let data = {
@@ -754,22 +761,14 @@
       if(!data.name || !data.url || !data.reward) return toast('Please fill Name, Reward & URL');
       db.ref('config/webTasks/' + id).set(data).then(() => { 
         toast('Task Added Successfully'); 
-        document.getElementById('taskName').value = ''; 
-        document.getElementById('taskReward').value = ''; 
-        document.getElementById('taskUrl').value = ''; 
-        document.getElementById('taskIcon').value = ''; 
+        ['taskName','taskReward','taskUrl','taskIcon'].forEach(i => document.getElementById(i).value = '');
       });
     }
 
     function deleteTask(id) { 
-      if(confirm('Are you sure you want to delete this task?')) {
-        db.ref('config/webTasks/' + id).remove().then(() => toast('Task Deleted!'));
-      }
+      if(confirm('Delete this task?')) db.ref('config/webTasks/' + id).remove().then(() => toast('Task Deleted!'));
     }
 
-    // ===================================================
-    // ✅ MAINTENANCE (unchanged)
-    // ===================================================
     function saveMaintenance() {
       const active = document.getElementById('maintenanceMode').value === 'true';
       db.ref('config/maintenance').set({
@@ -780,20 +779,41 @@
     }
 
     // ===================================================
-    // ✅ USERS MANAGEMENT (unchanged)
+    // ✅ USERS MANAGEMENT (ENHANCED with qualified refs)
     // ===================================================
-    function loadUsers() {
-      db.ref('users').once('value', snap => {
+    async function loadUsers() {
+      try {
+        const snap = await db.ref('users').once('value');
         allUsers = [];
-        if(snap.exists()) {
-          snap.forEach(child => {
-            let u = child.val();
-            u.id = child.key;
-            allUsers.push(u);
-          });
-        }
+        snap.forEach(child => {
+          let u = child.val();
+          u.id = child.key;
+          allUsers.push(u);
+        });
+        // Compute qualified refs for each user
+        await Promise.all(allUsers.map(async (u) => {
+          const refs = u.referredUsers || {};
+          const keys = Object.keys(refs);
+          let qualified = 0;
+          if (keys.length > 0) {
+            const checks = keys.map(async (rid) => {
+              const bSnap = await db.ref('users/' + rid + '/balance').once('value');
+              const bal = bSnap.exists() ? Number(bSnap.val() || 0) : 0;
+              if (bal >= MIN_REFERRAL_BALANCE) qualified++;
+            });
+            await Promise.all(checks);
+          }
+          u._qualifiedRefs = qualified;
+          u._totalRefs = keys.length;
+          // Count ad views
+          let views = 0;
+          const da = u.dailyAds || {};
+          for (let k in da) views += Number(da[k]) || 0;
+          u._adViews = views;
+          u._adClicks = u.adClicks || 0;
+        }));
         filterUsers();
-      });
+      } catch(e) { console.error(e); }
     }
 
     function filterUsers() {
@@ -814,24 +834,32 @@
       let html = '';
       filteredUsers.forEach(u => {
         const isBanned = u.isBanned || false;
-        const statusClass = isBanned ? 'banned' : 'active';
-        const statusText = isBanned ? '🚫 Banned' : '✅ Active';
-        const isVerified = u.channelVerified || false;
+        const isVerified = u.channelVerified === true;
         const wdCount = u.withdrawCount || 0;
-        const refs = u.referrals || 0;
+        const refs = u._qualifiedRefs || 0;
         const level = getReferralLevel(refs);
         html += `
         <div class="user-card">
           <div class="user-info">
-            <div class="name">${u.name || 'Unknown'} <span class="status-badge ${statusClass}">${statusText}</span></div>
-            <div class="id">ID: ${u.id} ${isVerified ? '✅ Verified' : '❌ Not Verified'} | Withdraws: ${wdCount}</div>
-            <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} | Referrals: ${refs} <span class="ref-level-badge ${level.class}">${level.label}</span></div>
+            <div class="name">${u.name || 'Unknown'} 
+              <span class="status-badge ${isBanned ? 'banned' : 'active'}">${isBanned ? '🚫 Banned' : '✅ Active'}</span>
+              <span class="status-badge ${isVerified ? 'verified' : 'notverified'}">${isVerified ? '✅ Verified' : '❌ Not Verified'}</span>
+            </div>
+            <div class="id">ID: ${u.id} | Withdraws: ${wdCount}</div>
+            <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} <span class="ref-level-badge ${level.class}">${level.label}</span></div>
+            
+            <div class="user-stats-grid">
+              <div class="user-stat-mini green"><span class="val">${refs}</span>Qualified Refs</div>
+              <div class="user-stat-mini"><span class="val">${u._adViews || 0}</span>Ad Views</div>
+              <div class="user-stat-mini"><span class="val">${u._adClicks || 0}</span>Ad Clicks</div>
+            </div>
           </div>
-          <div class="user-actions">
-            <button class="btn btn-green btn-small" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>
+          <div class="user-actions" style="margin-top:10px;">
+            <button class="btn btn-green btn-small" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i> Bal</button>
             <button class="btn ${isBanned ? 'btn-green' : 'btn-warning'} btn-small" onclick="toggleBan('${u.id}', ${!isBanned})">
               <i class="fas ${isBanned ? 'fa-check' : 'fa-ban'}"></i> ${isBanned ? 'Unban' : 'Ban'}
             </button>
+            <button class="btn btn-info btn-small" onclick="forceReverifyUser('${u.id}')"><i class="fas fa-redo"></i> Re-verify</button>
             <button class="btn btn-red btn-small" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
           </div>
         </div>`;
@@ -839,10 +867,7 @@
       container.innerHTML = html;
     }
 
-    function refreshUsers() {
-      loadUsers();
-      toast('Users refreshed!');
-    }
+    function refreshUsers() { loadUsers(); toast('Users refreshed!'); }
 
     function editUser(userId) {
       const user = allUsers.find(u => u.id === userId);
@@ -850,8 +875,7 @@
       const newBal = prompt(`Enter new balance for ${user.name || userId}:`, user.balance || 0);
       if(newBal !== null && !isNaN(newBal)) {
         db.ref('users/' + userId + '/balance').set(Number(newBal)).then(() => {
-          toast('Balance updated!');
-          loadUsers();
+          toast('Balance updated!'); loadUsers();
         });
       }
     }
@@ -860,23 +884,84 @@
       const action = ban ? 'ban' : 'unban';
       if(confirm(`Are you sure you want to ${action} this user?`)) {
         db.ref('users/' + userId).update({ isBanned: ban }).then(() => {
-          toast(`User ${action}ned!`);
-          loadUsers();
+          toast(`User ${action}ned!`); loadUsers();
+        });
+      }
+    }
+
+    // ✅ NEW: Force re-verify single user
+    function forceReverifyUser(userId) {
+      if(confirm('Force this user to re-verify all channels?')) {
+        db.ref('users/' + userId).update({ channelVerified: false, verifiedChannels: null }).then(() => {
+          toast('✅ User will re-verify on next open!'); loadUsers();
         });
       }
     }
 
     function deleteUser(userId) {
-      if(confirm('⚠️ Are you sure you want to DELETE this user and all their data? This cannot be undone!')) {
-        db.ref('users/' + userId).remove().then(() => {
-          toast('User deleted!');
-          loadUsers();
-        });
+      if(confirm('⚠️ DELETE this user and all data? Cannot be undone!')) {
+        db.ref('users/' + userId).remove().then(() => { toast('User deleted!'); loadUsers(); });
       }
     }
 
     // ===================================================
-    // ✅ WITHDRAWALS (unchanged)
+    // ✅ ANALYTICS
+    // ===================================================
+    async function loadAnalytics() {
+      try {
+        const usersSnap = await db.ref('users').once('value');
+        let userData = [];
+        let totalViews = 0, totalClicks = 0;
+        const today = new Date().toISOString().slice(0, 10);
+
+        if (usersSnap.exists()) {
+          usersSnap.forEach(child => {
+            const u = child.val();
+            const dailyAds = u.dailyAds || {};
+            let views = 0;
+            for (let key in dailyAds) views += Number(dailyAds[key]) || 0;
+            const clicks = u.adClicks || 0;
+            const lastActive = u.lastActive || 'Never';
+            totalViews += views;
+            totalClicks += clicks;
+            userData.push({ id: child.key, name: u.name || 'User', views, clicks, lastActive });
+          });
+        }
+        userData.sort((a, b) => b.views - a.views);
+        document.getElementById('totalUsers').textContent = usersSnap.exists() ? usersSnap.numChildren() : 0;
+        document.getElementById('totalAdViews').textContent = totalViews;
+        document.getElementById('totalAdClicks').textContent = totalClicks;
+        const clickRate = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : 0;
+        document.getElementById('avgClickRate').textContent = clickRate + '%';
+
+        const tbody = document.getElementById('analyticsTableBody');
+        if (userData.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No data yet.</td></tr>';
+          return;
+        }
+        let html = '';
+        userData.slice(0, 30).forEach(u => {
+          const rate = u.views > 0 ? ((u.clicks / u.views) * 100).toFixed(1) : 0;
+          const lastActiveStr = u.lastActive === today ? '🟢 Today' : u.lastActive;
+          html += `<tr>
+            <td class="user-id">${u.name}<br><span style="font-size:0.7rem; color:#999;">${u.id}</span></td>
+            <td><strong>${u.views}</strong></td>
+            <td><strong>${u.clicks}</strong></td>
+            <td>${rate}%</td>
+            <td style="font-size:0.75rem;">${lastActiveStr}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = html;
+      } catch (e) {
+        console.error('Analytics error:', e);
+        document.getElementById('analyticsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger);">Error loading</td></tr>';
+      }
+    }
+
+    function refreshAnalytics() { toast('Refreshing...'); loadAnalytics(); }
+
+    // ===================================================
+    // ✅ WITHDRAWALS
     // ===================================================
     db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', snap => {
       let html = '';
@@ -922,19 +1007,16 @@
             count++;
             const statusColor = req.status === 'approved' ? '#00b894' : req.status === 'pending' ? '#f39c12' : '#ff4757';
             const feeText = req.fee ? `Fee: ${req.fee.toFixed(2)}` : '';
-            const levelText = req.level ? `L${req.level}` : '';
             html += `
             <div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
-              <span><b>${req.userName || 'User'}</b> (${req.userId}) ${levelText}</span>
+              <span><b>${req.userName || 'User'}</b> (${req.userId})</span>
               <span>${req.method} - ${req.account}</span>
               <span style="font-weight:800; color:var(--primary);">${req.amount} ${feeText}</span>
               <span style="color:${statusColor}; font-weight:700; background:${statusColor}15; padding:2px 10px; border-radius:12px;">${req.status}</span>
             </div>`;
           });
           if(count === 0) html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>';
-        } else {
-          html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>';
-        }
+        } else { html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>'; }
         document.getElementById('allWdContainer').innerHTML = html;
       });
     }
@@ -956,40 +1038,64 @@
           }
           await db.ref('withdrawals/' + id).update({ status: 'rejected' });
           toast('Rejected & Refunded!');
-        } catch(e) {
-          toast('Error!');
-        }
+        } catch(e) { toast('Error!'); }
       }
     }
 
     // ===================================================
-    // ✅ REFERRAL STATS (unchanged)
+    // ✅ REFERRAL STATS (ENHANCED with qualified count)
     // ===================================================
     async function loadReferralStats() {
       try {
         const snap = await db.ref('users').once('value');
         let users = [];
-        let totalRefs = 0;
-        let topReferrers = [];
-        
+        let totalRefs = 0, totalQualifiedRefs = 0;
+        let allReferralDetails = [];
+
+        // Build map of all balances first for quick lookup
+        const balanceMap = {};
+        snap.forEach(child => {
+          const u = child.val();
+          balanceMap[child.key] = Number(u.balance || 0);
+        });
+
         if(snap.exists()) {
           snap.forEach(child => {
             const u = child.val();
-            if (u.referrals && u.referrals > 0) {
+            const id = child.key;
+            const refs = u.referredUsers || {};
+            const keys = Object.keys(refs);
+            let qualified = 0;
+            keys.forEach(rid => {
+              if ((balanceMap[rid] || 0) >= MIN_REFERRAL_BALANCE) qualified++;
+              allReferralDetails.push({
+                referrerId: id,
+                referrerName: u.name || 'User',
+                referredId: rid,
+                referredName: refs[rid].name || 'User',
+                referredBalance: balanceMap[rid] || 0,
+                qualified: (balanceMap[rid] || 0) >= MIN_REFERRAL_BALANCE,
+                joinedAt: refs[rid].joinedAt || 0
+              });
+            });
+            if (keys.length > 0) {
               users.push({
-                id: child.key,
+                id: id,
                 name: u.name || 'User',
-                referrals: u.referrals || 0,
+                totalReferrals: keys.length,
+                qualifiedReferrals: qualified,
                 balance: u.balance || 0
               });
-              totalRefs += u.referrals;
+              totalRefs += keys.length;
+              totalQualifiedRefs += qualified;
             }
           });
         }
         
-        users.sort((a, b) => b.referrals - a.referrals);
-        topReferrers = users.slice(0, 10);
+        users.sort((a, b) => b.qualifiedReferrals - a.qualifiedReferrals);
+        const topReferrers = users.slice(0, 10);
         
+        // Leaderboard
         const leaderContainer = document.getElementById('adminRefLeaderboard');
         if (topReferrers.length === 0) {
           leaderContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No referrals yet.</p>';
@@ -998,7 +1104,7 @@
           const medals = ['🥇', '🥈', '🥉'];
           topReferrers.forEach((u, i) => {
             const medal = i < 3 ? medals[i] : `#${i+1}`;
-            const level = getReferralLevel(u.referrals);
+            const level = getReferralLevel(u.qualifiedReferrals);
             html += `
             <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--bg); border-radius:12px; margin-bottom:8px; border:1px solid var(--border);">
               <div style="font-weight:900; font-size:1.1rem; color:var(--primary); width:40px; text-align:center;">${medal}</div>
@@ -1007,7 +1113,8 @@
                 <div style="font-size:0.75rem; color:var(--text-light);">ID: ${u.id}</div>
               </div>
               <div style="text-align:right;">
-                <div style="font-weight:800; color:var(--primary);">${u.referrals} Refs</div>
+                <div style="font-weight:800; color:var(--success);">✅ ${u.qualifiedReferrals}</div>
+                <div style="font-size:0.7rem; color:#888;">Total: ${u.totalReferrals}</div>
                 <span class="ref-level-badge ${level.class}" style="font-size:0.6rem;">${level.label}</span>
               </div>
             </div>`;
@@ -1015,28 +1122,57 @@
           leaderContainer.innerHTML = html;
         }
         
+        // Stats
         const statsContainer = document.getElementById('adminRefStats');
         const totalUsers = snap.exists() ? snap.numChildren() : 0;
-        const avgRefs = totalUsers > 0 ? (totalRefs / totalUsers).toFixed(2) : 0;
         statsContainer.innerHTML = `
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
               <div style="font-size:1.5rem; font-weight:800; color:var(--primary);">${totalRefs}</div>
               <div style="font-size:0.7rem; color:var(--text-light);">Total Referrals</div>
             </div>
             <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
-              <div style="font-size:1.5rem; font-weight:800; color:var(--success);">${users.length}</div>
+              <div style="font-size:1.5rem; font-weight:800; color:var(--success);">${totalQualifiedRefs}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Qualified (${MIN_REFERRAL_BALANCE}+ TK)</div>
+            </div>
+            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
+              <div style="font-size:1.5rem; font-weight:800; color:var(--warning);">${users.length}</div>
               <div style="font-size:0.7rem; color:var(--text-light);">Users with Refs</div>
             </div>
             <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
-              <div style="font-size:1.5rem; font-weight:800; color:var(--warning);">${avgRefs}</div>
-              <div style="font-size:0.7rem; color:var(--text-light);">Avg Refs/User</div>
+              <div style="font-size:1.5rem; font-weight:800; color:var(--danger);">${totalUsers}</div>
+              <div style="font-size:0.7rem; color:var(--text-light);">Total Users</div>
             </div>
           </div>
-          <div style="margin-top:12px; font-size:0.8rem; color:#888; text-align:center;">
-            Total Users: ${totalUsers} | Top Referrer: ${topReferrers.length > 0 ? topReferrers[0].name + ' (' + topReferrers[0].referrals + ')' : 'N/A'}
-          </div>
         `;
+
+        // Referral details (recent 30)
+        const detailContainer = document.getElementById('referralDetailsList');
+        if (allReferralDetails.length === 0) {
+          detailContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No referral records yet.</p>';
+        } else {
+          allReferralDetails.sort((a,b) => (b.joinedAt || 0) - (a.joinedAt || 0));
+          let html = '';
+          allReferralDetails.slice(0, 30).forEach(r => {
+            const badge = r.qualified 
+              ? '<span style="color:#00b894; font-weight:800;">✅ Qualified</span>' 
+              : '<span style="color:#ff4757; font-weight:800;">❌ Not Qualified</span>';
+            html += `<div style="padding:10px 12px; background:#fff; border:1px solid #eee; border-radius:10px; margin-bottom:8px; font-size:0.82rem;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span><b>${r.referrerName}</b> <span style="color:#888; font-size:0.7rem;">(${r.referrerId})</span></span>
+                <span style="color:#888; font-size:0.7rem;">${new Date(r.joinedAt).toLocaleDateString()}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span>↳ ${r.referredName} <span style="color:#888; font-size:0.7rem;">(${r.referredId})</span></span>
+                <span>💰 ${r.referredBalance.toFixed(2)} TK ${badge}</span>
+              </div>
+            </div>`;
+          });
+          if (allReferralDetails.length > 30) {
+            html += `<p style="text-align:center; color:#888; font-size:0.8rem;">+ ${allReferralDetails.length - 30} more...</p>`;
+          }
+          detailContainer.innerHTML = html;
+        }
       } catch(e) {
         console.error('Error loading referral stats:', e);
       }
@@ -1051,10 +1187,8 @@
     // ✅ INIT
     // ===================================================
     window.onload = function() {
-      // Load analytics if the tab is active by default? No, default is settings.
-      // But we'll load on demand when tab is switched.
-      // Also load on startup for convenience
       loadAnalytics();
+      loadVerificationStats();
     };
   </script>
 </body>
