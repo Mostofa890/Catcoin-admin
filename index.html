@@ -4,231 +4,1190 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Admin Panel - Earn Wallet</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
   <style>
-    :root { --primary: #6C5CE7; --bg: #f4f6fb; --surface: #FFF; --text: #2D3436; --danger: #ff4757; --success: #00b894; --warning: #f39c12; --border: #e1e1e1; }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 30px; }
-    
-    .header { background: linear-gradient(135deg, #4b3ee0, var(--primary)); color: #fff; padding: 25px 20px; text-align: center; font-size: 1.3rem; font-weight: 800; position: sticky; top:0; z-index:10; box-shadow: 0 4px 15px rgba(108,92,231,0.3); border-radius: 0 0 25px 25px; margin-bottom: 20px;}
-    .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
-    
-    .tabs { display: flex; overflow-x: auto; background: var(--surface); border-radius: 15px; padding: 5px; gap: 5px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-    .tab { flex: 1; text-align: center; padding: 12px 10px; font-weight: 700; color: #888; cursor: pointer; border-radius: 10px; white-space: nowrap; transition: 0.3s; font-size: 0.8rem; min-width: 70px;}
-    .tab.active { background: rgba(108,92,231,0.1); color: var(--primary); }
-
-    .tab-content { display: none; animation: fadeIn 0.3s ease; }
-    .tab-content.active { display: block; }
-    @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
-    .card { background: var(--surface); padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-    h3 { font-size: 1.1rem; margin-bottom: 15px; border-bottom: 2px dashed #eee; padding-bottom: 10px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-    
-    .form-group { margin-bottom: 15px; }
-    label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; color: #444; }
-    input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 12px; font-size: 0.95rem; outline: none; background: #fafafa; transition: 0.3s; font-weight: 600;}
-    input:focus, textarea:focus, select:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(108,92,231,0.1);}
-    
-    .btn { width: 100%; background: linear-gradient(135deg, var(--primary), #A29BFE); color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 5px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;}
-    .btn:active { transform: scale(0.97); }
-    .btn-green { background: linear-gradient(135deg, #00b894, #00cec9); }
-    .btn-red { background: linear-gradient(135deg, #ff4757, #ff6b81); }
-    .btn-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
-    .btn-info { background: linear-gradient(135deg, #0984e3, #74b9ff); }
-    .btn-small { width: auto; padding: 10px 15px; font-size: 0.85rem; border-radius: 8px;}
-    
-    .wd-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-    .wd-head { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 12px; border-bottom: 1px dashed #ddd; padding-bottom: 12px;}
-    .wd-info { font-size: 0.9rem; color: #555; margin-bottom: 15px; line-height: 1.6; }
-    .wd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    
-    .user-card { border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-    .user-info { flex: 1; min-width: 150px; margin-bottom: 10px;}
-    .user-info .name { font-weight: 700; font-size: 1rem; }
-    .user-info .id { font-size: 0.8rem; color: #999; }
-    .user-info .bal { font-weight: 800; color: var(--primary); }
-    .user-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .user-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
-    .user-stat-mini { background: #f7f7fb; padding: 6px 4px; border-radius: 8px; text-align: center; font-size: 0.7rem; font-weight: 700; color: #555;}
-    .user-stat-mini .val { font-size: 0.9rem; font-weight: 900; color: var(--primary); display: block;}
-    .user-stat-mini.green .val { color: var(--success); }
-    .user-stat-mini.red .val { color: var(--danger); }
-    
-    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #2d3436; color: #fff; padding: 12px 25px; border-radius: 30px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; font-weight: 600; max-width: 90%; text-align: center;}
-    .toast.show { opacity: 1; top: 30px; }
-
-    .status-badge { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
-    .status-badge.active { background: rgba(0,184,148,0.15); color: var(--success); }
-    .status-badge.banned { background: rgba(255,71,87,0.15); color: var(--danger); }
-    .status-badge.verified { background: rgba(0,184,148,0.15); color: var(--success); }
-    .status-badge.notverified { background: rgba(255,71,87,0.15); color: var(--danger); }
-
-    .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
-    .search-box input { flex: 1; }
-    .search-box button { width: auto; padding: 14px 20px; }
-
-    .channel-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-    .channel-item input { flex: 1; }
-    .channel-item .btn-small { width: auto; padding: 10px 12px; }
-
-    .ref-level-badge {
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 0.65rem;
-        font-weight: 700;
+    /* ============= MODERN DESIGN SYSTEM ============= */
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+      --bg: #f8fafc;
+      --bg-alt: #f1f5f9;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --success-bg: #d1fae5;
+      --danger: #ef4444;
+      --danger-bg: #fee2e2;
+      --warning: #f59e0b;
+      --warning-bg: #fef3c7;
+      --info: #3b82f6;
+      --info-bg: #dbeafe;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+      --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
     }
-    .ref-level-badge.beginner { background: rgba(108,92,231,0.15); color: var(--primary); }
-    .ref-level-badge.bronze { background: rgba(205,127,50,0.2); color: #cd7f32; }
-    .ref-level-badge.silver { background: rgba(192,192,192,0.25); color: #7a7a7a; }
-    .ref-level-badge.gold { background: rgba(255,215,0,0.25); color: #b8860b; }
-    .ref-level-badge.platinum { background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(162,155,254,0.2)); color: var(--primary); }
 
-    .level-edit-item { background: #f9f9f9; padding: 12px; border-radius: 10px; border: 1px solid #e1e1e1; margin-bottom: 10px; }
-    .level-edit-item .level-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .level-edit-item .level-header .level-num { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
-    .level-edit-item .level-fields { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .level-edit-item .level-fields input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; background: #fff; width: 70px; }
-    .level-edit-item .level-fields input.wide { width: 100px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 30px;
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em;
+    }
 
-    /* Analytics */
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-    .stat-card { background: var(--bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
-    .stat-card .num { font-size: 1.8rem; font-weight: 900; color: var(--primary); line-height: 1.2; }
-    .stat-card .label { font-size: 0.7rem; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    /* ============= ANIMATED BACKGROUND ============= */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 60%);
+      z-index: -1;
+      animation: bgMove 20s ease-in-out infinite;
+    }
+    @keyframes bgMove {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-5%, -5%); }
+    }
+
+    .container { max-width: 680px; margin: 0 auto; padding: 0 16px; }
+
+    /* ============= MODERN HEADER ============= */
+    .header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      color: #fff;
+      padding: 28px 24px 60px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0 0 32px 32px;
+      margin-bottom: -32px;
+      z-index: 1;
+      box-shadow: 0 20px 40px -10px rgba(67, 56, 202, 0.4);
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.5), transparent 70%);
+      top: -100px;
+      right: -60px;
+      border-radius: 50%;
+      filter: blur(20px);
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.3), transparent 70%);
+      bottom: -80px;
+      left: -40px;
+      border-radius: 50%;
+      filter: blur(20px);
+    }
+    .header-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #a78bfa, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    }
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .header-subtitle {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 2px;
+    }
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    .header-status .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    /* ============= MODERN TABS ============= */
+    .tabs-wrapper {
+      position: relative;
+      z-index: 2;
+      margin-top: 16px;
+      padding: 0 4px;
+    }
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 6px;
+      gap: 4px;
+      box-shadow: var(--shadow-lg);
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      border: 1px solid var(--border);
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 0 0 auto;
+      min-width: 84px;
+      text-align: center;
+      padding: 10px 12px;
+      font-weight: 700;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 14px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      user-select: none;
+    }
+    .tab i {
+      font-size: 1.05rem;
+      transition: transform 0.25s;
+    }
+    .tab:hover {
+      background: var(--bg-alt);
+      color: var(--text-secondary);
+    }
+    .tab.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+    }
+    .tab.active i { transform: scale(1.1); }
+
+    /* ============= TAB CONTENT ============= */
+    .tab-content {
+      display: none;
+      padding-top: 24px;
+      animation: fadeSlide 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tab-content.active { display: block; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============= MODERN CARDS ============= */
+    .card {
+      background: var(--surface);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+    .card-title-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      color: #fff;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+    .icon-primary { background: linear-gradient(135deg, #6366f1, #818cf8); }
+    .icon-success { background: linear-gradient(135deg, #10b981, #34d399); }
+    .icon-warning { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+    .icon-danger { background: linear-gradient(135deg, #ef4444, #f87171); }
+    .icon-info { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+    .icon-purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+    .icon-cyan { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
+
+    /* ============= MODERN FORM ELEMENTS ============= */
+    .form-group { margin-bottom: 16px; }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      letter-spacing: 0.01em;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      background: var(--bg-alt);
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--text);
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); font-weight: 500; }
+    textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 18px;
+      padding-right: 42px;
+    }
+
+    /* ============= MODERN BUTTONS ============= */
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(99, 102, 241, 0.4);
+    }
+    .btn:active { transform: translateY(0) scale(0.98); }
+    .btn-green {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    }
+    .btn-green:hover { box-shadow: 0 10px 22px rgba(16, 185, 129, 0.4); }
+    .btn-red {
+      background: linear-gradient(135deg, #ef4444, #f87171);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+    }
+    .btn-red:hover { box-shadow: 0 10px 22px rgba(239, 68, 68, 0.4); }
+    .btn-warning {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+    }
+    .btn-warning:hover { box-shadow: 0 10px 22px rgba(245, 158, 11, 0.4); }
+    .btn-info {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+    }
+    .btn-small {
+      width: auto;
+      padding: 9px 14px;
+      font-size: 0.78rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .btn-small:hover { box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15); }
+
+    /* ============= STAT CARDS (MODERN) ============= */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: var(--surface);
+      padding: 18px 14px;
+      border-radius: var(--radius);
+      text-align: center;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    .stat-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .stat-card.warning::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .stat-card.danger::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .stat-card.info::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .stat-card .num {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
     .stat-card.green .num { color: var(--success); }
     .stat-card.warning .num { color: var(--warning); }
     .stat-card.danger .num { color: var(--danger); }
-    
-    .activity-table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
-    .activity-table th { text-align: left; padding: 8px 6px; border-bottom: 2px solid #eee; font-weight: 700; color: #555; }
-    .activity-table td { padding: 8px 6px; border-bottom: 1px solid #f0f0f0; }
-    .activity-table .user-id { font-weight: 600; color: var(--primary); }
+    .stat-card.info .num { color: var(--info); }
+    .stat-card .label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 6px;
+    }
 
-    /* Warning/Info Boxes */
-    .alert-box { padding: 12px 14px; border-radius: 12px; font-size: 0.82rem; font-weight: 600; margin-bottom: 12px; line-height: 1.5; display: flex; align-items: flex-start; gap: 10px;}
-    .alert-box i { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px;}
-    .alert-box.warning { background: rgba(243,156,18,0.1); border: 1px dashed rgba(243,156,18,0.4); color: #b9770e; }
-    .alert-box.info { background: rgba(9,132,227,0.08); border: 1px dashed rgba(9,132,227,0.3); color: #0984e3; }
-    .alert-box.success { background: rgba(0,184,148,0.1); border: 1px dashed rgba(0,184,148,0.4); color: #0e7a61; }
-    
-    .channel-verified-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f9f9f9; border-radius: 10px; margin-bottom: 6px; font-size: 0.85rem; border: 1px solid #e1e1e1;}
-    .channel-verified-item i { color: var(--primary); }
-    .channel-verified-item .ch-name { flex: 1; font-weight: 700; }
-    .channel-verified-item .ch-id { font-size: 0.75rem; color: #888; }
+    /* ============= MODERN USER CARDS ============= */
+    .user-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .user-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--primary), var(--secondary));
+    }
+    .user-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateX(2px);
+    }
+    .user-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .user-avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+      box-shadow: 0 6px 14px rgba(99, 102, 241, 0.25);
+    }
+    .user-name {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-id {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .user-balance-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .user-balance {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 0.85rem;
+      background: rgba(99, 102, 241, 0.08);
+      padding: 4px 12px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .user-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .user-stat-mini {
+      background: var(--bg-alt);
+      padding: 10px 8px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .user-stat-mini:hover { background: var(--surface); }
+    .user-stat-mini .val {
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--primary);
+      display: block;
+      letter-spacing: -0.02em;
+    }
+    .user-stat-mini.green .val { color: var(--success); }
+    .user-stat-mini.red .val { color: var(--danger); }
+    .user-stat-mini .lbl {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+    .user-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    /* ============= BADGES ============= */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .status-badge.active { background: var(--success-bg); color: #047857; }
+    .status-badge.banned { background: var(--danger-bg); color: #b91c1c; }
+    .status-badge.verified { background: var(--success-bg); color: #047857; }
+    .status-badge.notverified { background: var(--danger-bg); color: #b91c1c; }
+
+    .ref-level-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .ref-level-badge.beginner { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
+    .ref-level-badge.bronze { background: rgba(205, 127, 50, 0.15); color: #b45309; }
+    .ref-level-badge.silver { background: rgba(148, 163, 184, 0.2); color: #475569; }
+    .ref-level-badge.gold { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+    .ref-level-badge.platinum { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15)); color: var(--primary); }
+
+    /* ============= MODERN ALERT BOXES ============= */
+    .alert-box {
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      line-height: 1.55;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-left: 4px solid;
+    }
+    .alert-box i { font-size: 1.15rem; flex-shrink: 0; margin-top: 1px; }
+    .alert-box.warning {
+      background: var(--warning-bg);
+      border-color: var(--warning);
+      color: #92400e;
+    }
+    .alert-box.info {
+      background: var(--info-bg);
+      border-color: var(--info);
+      color: #1e40af;
+    }
+    .alert-box.success {
+      background: var(--success-bg);
+      border-color: var(--success);
+      color: #065f46;
+    }
+    .alert-box.danger {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: #991b1b;
+    }
+
+    /* ============= MODERN TOAST ============= */
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-xl);
+      max-width: calc(100% - 40px);
+      text-align: center;
+      letter-spacing: -0.01em;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ============= WITHDRAWAL CARDS ============= */
+    .wd-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .wd-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #f59e0b, #fbbf24);
+    }
+    .wd-card:hover { box-shadow: var(--shadow-md); }
+    .wd-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .wd-method {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--info-bg);
+      color: #1e40af;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.75rem;
+    }
+    .wd-amount {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+    .wd-info { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px; }
+    .wd-info b { color: var(--text); font-weight: 700; }
+    .wd-account { color: #dc2626; font-weight: 800; font-size: 0.88rem; }
+    .wd-actions { display: flex; gap: 8px; }
+    .wd-actions .btn { flex: 1; }
+
+    /* ============= LEVEL EDIT ITEMS ============= */
+    .level-edit-item {
+      background: var(--bg-alt);
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .level-edit-item:hover { border-color: var(--primary); background: #fff; }
+    .level-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .level-num {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 0.85rem;
+      background: rgba(99, 102, 241, 0.1);
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+    .level-fields {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .level-fields input {
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      background: #fff;
+      width: 68px;
+      border-radius: 8px;
+    }
+    .level-fields input.wide { width: 110px; }
+
+    /* ============= CHANNEL ITEMS ============= */
+    .channel-item {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+      background: var(--bg-alt);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+    }
+    .channel-item input { flex: 1; background: #fff; padding: 10px 12px; font-size: 0.82rem; }
+
+    .channel-verified-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-alt);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      border: 1.5px solid var(--border);
+      transition: all 0.2s;
+    }
+    .channel-verified-item:hover { background: #fff; border-color: var(--primary); }
+    .channel-verified-item i {
+      color: var(--primary);
+      font-size: 1.2rem;
+      background: rgba(99, 102, 241, 0.1);
+      padding: 8px;
+      border-radius: 10px;
+    }
+    .channel-verified-item .ch-info { flex: 1; min-width: 0; }
+    .channel-verified-item .ch-name { font-weight: 800; font-size: 0.85rem; color: var(--text); }
+    .channel-verified-item .ch-id { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+
+    /* ============= SEARCH BOX ============= */
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .search-box input {
+      padding-left: 44px;
+      background: var(--bg-alt);
+    }
+    .search-box i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    /* ============= ACTIVITY TABLE (MODERN) ============= */
+    .activity-table {
+      width: 100%;
+      font-size: 0.82rem;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+    }
+    .activity-table thead th {
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      border-bottom: 2px solid var(--border);
+    }
+    .activity-table tbody tr {
+      background: var(--bg-alt);
+      transition: all 0.2s;
+    }
+    .activity-table tbody tr:hover { background: #fff; box-shadow: var(--shadow-sm); }
+    .activity-table tbody td {
+      padding: 12px;
+      border-radius: 0;
+    }
+    .activity-table tbody tr td:first-child { border-radius: 10px 0 0 10px; }
+    .activity-table tbody tr td:last-child { border-radius: 0 10px 10px 0; }
+    .activity-table .user-id { font-weight: 700; color: var(--primary); }
+
+    /* ============= MODERN TASK ITEMS ============= */
+    .task-admin-item {
+      background: var(--bg-alt);
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      border: 1.5px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .task-admin-item:hover { background: #fff; border-color: var(--primary); }
+    .task-admin-info { flex: 1; min-width: 0; }
+    .task-admin-info .name { font-weight: 800; font-size: 0.9rem; color: var(--text); }
+    .task-admin-info .reward {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--success-bg);
+      color: #047857;
+      font-weight: 800;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-left: 6px;
+    }
+    .task-admin-info .url {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      word-break: break-all;
+      margin-top: 4px;
+    }
+
+    /* ============= AD SLOT BOX ============= */
+    .ad-slot-box {
+      background: var(--bg-alt);
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+    .ad-slot-box:hover { border-color: var(--primary); }
+    .ad-slot-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+    .ad-slot-header i {
+      background: rgba(99, 102, 241, 0.1);
+      padding: 8px;
+      border-radius: 9px;
+    }
+
+    /* ============= STATS MINI GRID ============= */
+    .stat-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-mini {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.06));
+      padding: 16px 12px;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      border: 1.5px solid rgba(99, 102, 241, 0.15);
+    }
+    .stat-mini .num {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .stat-mini .num.green { color: var(--success); }
+    .stat-mini .num.red { color: var(--danger); }
+    .stat-mini .lbl {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 6px;
+    }
+
+    /* ============= REFERRAL DETAIL ITEM ============= */
+    .ref-detail-item {
+      padding: 12px 14px;
+      background: var(--bg-alt);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+    .ref-detail-item:hover { background: #fff; border-color: var(--primary); }
+    .ref-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ref-detail-row + .ref-detail-row { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); }
+    .ref-detail-name { font-weight: 800; color: var(--text); }
+    .ref-detail-id { color: var(--text-muted); font-size: 0.7rem; font-weight: 600; margin-left: 4px;}
+    .ref-detail-bal { font-weight: 800; color: var(--primary); }
+    .ref-qualified { color: var(--success); font-weight: 800; }
+    .ref-notqualified { color: var(--danger); font-weight: 800; }
+
+    /* ============= LEADERBOARD ITEM ============= */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-alt);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      border: 1.5px solid var(--border);
+      transition: all 0.2s;
+    }
+    .leaderboard-item:hover { background: #fff; border-color: var(--primary); }
+    .leaderboard-medal {
+      font-weight: 900;
+      font-size: 1.15rem;
+      width: 40px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .leaderboard-info { flex: 1; min-width: 0; }
+    .leaderboard-name { font-weight: 800; font-size: 0.88rem; color: var(--text); }
+    .leaderboard-id { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+    .leaderboard-stats { text-align: right; flex-shrink: 0; }
+    .leaderboard-qualified { font-weight: 900; color: var(--success); font-size: 1rem; }
+    .leaderboard-total { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+
+    /* ============= EMPTY STATE ============= */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state .icon {
+      font-size: 3rem;
+      color: var(--border);
+      margin-bottom: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--bg-alt);
+    }
+    .empty-state p {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    /* ============= NOT VERIFIED USER ITEM ============= */
+    .nv-user-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border: 1.5px solid rgba(239, 68, 68, 0.2);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      align-items: center;
+      gap: 10px;
+    }
+    .nv-user-name { font-weight: 800; font-size: 0.85rem; color: var(--text); }
+    .nv-user-id { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;}
+    .nv-user-last { font-size: 0.68rem; color: var(--text-secondary); font-weight: 700; }
+
+    /* ============= RESPONSIVE ============= */
+    @media (max-width: 400px) {
+      .container { padding: 0 12px; }
+      .card { padding: 16px; border-radius: 20px; }
+      .header { padding: 22px 18px 55px; border-radius: 0 0 26px 26px; }
+      .header-title { font-size: 1rem; }
+      .stat-card .num { font-size: 1.5rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="header"><i class="fas fa-user-shield"></i> Admin Control Panel</div>
-  <div id="toast" class="toast">Saved!</div>
+
+  <!-- ===== MODERN HEADER ===== -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-brand">
+        <div class="header-logo"><i class="fas fa-shield-halved"></i></div>
+        <div>
+          <div class="header-title">Admin Panel</div>
+          <div class="header-subtitle">Earn Wallet Control Center</div>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="dot"></span>
+        <span>Live</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved!</div>
 
   <div class="container">
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> General</div>
-      <div class="tab" onclick="switchTab('channels', this)"><i class="fas fa-link"></i> Channels</div>
-      <div class="tab" onclick="switchTab('analytics', this)"><i class="fas fa-chart-bar"></i> Analytics</div>
-      <div class="tab" onclick="switchTab('users', this)"><i class="fas fa-users"></i> Users</div>
-      <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-wallet"></i> Payouts</div>
-      <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-ad"></i> Ads & Tasks</div>
-      <div class="tab" onclick="switchTab('maintenance', this)"><i class="fas fa-tools"></i> Maintenance</div>
-      <div class="tab" onclick="switchTab('referrals', this)"><i class="fas fa-user-plus"></i> Referrals</div>
+    <!-- ===== MODERN TABS ===== -->
+    <div class="tabs-wrapper">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('settings', this)"><i class="fas fa-sliders"></i><span>Settings</span></div>
+        <div class="tab" onclick="switchTab('channels', this)"><i class="fas fa-satellite-dish"></i><span>Channels</span></div>
+        <div class="tab" onclick="switchTab('analytics', this)"><i class="fas fa-chart-pie"></i><span>Analytics</span></div>
+        <div class="tab" onclick="switchTab('users', this)"><i class="fas fa-users"></i><span>Users</span></div>
+        <div class="tab" onclick="switchTab('withdrawals', this)"><i class="fas fa-money-bill-transfer"></i><span>Payouts</span></div>
+        <div class="tab" onclick="switchTab('ads', this)"><i class="fas fa-rectangle-ad"></i><span>Ads</span></div>
+        <div class="tab" onclick="switchTab('maintenance', this)"><i class="fas fa-wrench"></i><span>System</span></div>
+        <div class="tab" onclick="switchTab('referrals', this)"><i class="fas fa-user-group"></i><span>Referrals</span></div>
+      </div>
     </div>
 
     <!-- ================= SETTINGS TAB ================= -->
     <div id="tab-settings" class="tab-content active">
       <div class="card">
-        <h3><i class="fas fa-robot"></i> App Details</h3>
-        <div class="form-group"><label>Bot Username (Without @)</label><input type="text" id="botUsername" placeholder="your_bot"></div>
-        <div class="form-group"><label>Currency Symbol</label><input type="text" id="currencySymbol" placeholder="TK"></div>
-        <div class="form-group"><label>Ad Reset Hour (0-23)</label>
-          <input type="number" id="adResetHour" placeholder="0" min="0" max="23">
-          <small style="font-size:0.7rem; color:#888;">Ads will reset at this hour daily (0 = midnight)</small>
-        </div>
-      </div>
-      <div class="card">
-        <h3><i class="fas fa-gift"></i> Referral & Bonus</h3>
-        <div class="form-group"><label>Daily Login Bonus (Amount)</label><input type="number" id="dailyBonusAmount" placeholder="20"></div>
-        <div class="form-group"><label>Bonus Per Referral</label><input type="number" id="refBonus" placeholder="5"></div>
-        <div class="form-group"><label>Minimum Referral Balance Requirement</label>
-          <input type="number" id="minReferralBalance" placeholder="20" value="20">
-          <small style="font-size:0.7rem; color:#888;">Referral will count as "valid" only if referred user has this much balance</small>
-        </div>
-        <div class="form-group"><label>Referral Levels (Auto-generated)</label>
-          <div style="background:#f9f9f9; padding:12px; border-radius:10px; font-size:0.85rem; color:#555; border:1px solid #eee;">
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; font-weight:700; border-bottom:1px solid #ddd; padding-bottom:5px; margin-bottom:5px;">
-              <span>Level</span><span>Min Refs</span><span>Badge</span>
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>BEGINNER</span><span>0</span><span>⭐</span></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>BRONZE</span><span>5</span><span>🥉</span></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>SILVER</span><span>15</span><span>🥈</span></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>GOLD</span><span>30</span><span>🥇</span></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0;"><span>PLATINUM</span><span>50</span><span>👑</span></div>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-primary"><i class="fas fa-robot"></i></div>
+            App Configuration
           </div>
         </div>
-        <div class="form-group"><label>Tutorial Video Link (YouTube)</label><input type="text" id="tutorialLink" placeholder="https://youtube.com/..."></div>
-        <div class="form-group"><label>Support Group/Channel Link</label><input type="text" id="supportLink" placeholder="https://t.me/your_group"></div>
-      </div>
-      <div class="card">
-        <h3><i class="fas fa-money-bill-wave"></i> Withdrawal System</h3>
-        <div class="form-group"><label>Minimum Withdraw Amount</label><input type="number" id="minWithdraw" placeholder="10"></div>
-        <div class="form-group"><label>Withdraw Notice Text</label><textarea id="withdrawNotice" rows="2" placeholder="Example: Payment will be sent in 24 hours"></textarea></div>
-        <div class="form-group"><label>Payment Methods (Comma separated)</label><input type="text" id="paymentMethods" placeholder="Bkash, Nagad, Binance"></div>
-        <div style="margin-top:15px; padding:12px; background:rgba(108,92,231,0.05); border-radius:12px; border:1px solid rgba(108,92,231,0.1);">
-          <h4 style="font-size:0.9rem; color:var(--primary); margin-bottom:8px;"><i class="fas fa-layer-group"></i> Withdraw Levels Configuration</h4>
-          <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">Each level defines required referrals, fee percentage, amount range and processing time.</p>
-          <div id="withdrawLevelsContainer"></div>
-          <button class="btn btn-green btn-small" onclick="addWithdrawLevel()" style="width:auto; padding:8px 16px; font-size:0.8rem; margin-top:5px;"><i class="fas fa-plus"></i> Add Level</button>
+        <div class="form-group"><label>Bot Username (Without @)</label><input type="text" id="botUsername" placeholder="your_bot"></div>
+        <div class="form-group"><label>Currency Symbol</label><input type="text" id="currencySymbol" placeholder="TK"></div>
+        <div class="form-group">
+          <label>Ad Reset Hour (0-23)</label>
+          <input type="number" id="adResetHour" placeholder="0" min="0" max="23">
+          <small style="font-size:0.72rem; color:#94a3b8; font-weight:600;">Ads reset at this hour daily</small>
         </div>
       </div>
-      <button class="btn" onclick="saveSettings()"><i class="fas fa-save"></i> Save General Settings</button>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-success"><i class="fas fa-gift"></i></div>
+            Referral & Bonus
+          </div>
+        </div>
+        <div class="form-group"><label>Daily Login Bonus (Amount)</label><input type="number" id="dailyBonusAmount" placeholder="20"></div>
+        <div class="form-group"><label>Bonus Per Referral</label><input type="number" id="refBonus" placeholder="5"></div>
+        <div class="form-group">
+          <label>Minimum Referral Balance Requirement</label>
+          <input type="number" id="minReferralBalance" placeholder="20" value="20">
+          <small style="font-size:0.72rem; color:#94a3b8; font-weight:600;">Referral counts as valid only if referred user has this much balance</small>
+        </div>
+        <div class="form-group">
+          <label>Referral Levels</label>
+          <div style="background:var(--bg-alt); padding:14px; border-radius:12px; font-size:0.82rem; color:#475569; border:1.5px solid var(--border);">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-weight:800; border-bottom:1.5px solid var(--border); padding-bottom:8px; margin-bottom:8px; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted);">
+              <span>Level</span><span>Min Refs</span><span>Badge</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:4px 0; font-weight:700;"><span>BEGINNER</span><span>0</span><span>⭐</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:4px 0; font-weight:700;"><span>BRONZE</span><span>5</span><span>🥉</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:4px 0; font-weight:700;"><span>SILVER</span><span>15</span><span>🥈</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:4px 0; font-weight:700;"><span>GOLD</span><span>30</span><span>🥇</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:4px 0; font-weight:700;"><span>PLATINUM</span><span>50</span><span>👑</span></div>
+          </div>
+        </div>
+        <div class="form-group"><label>Tutorial Video Link</label><input type="text" id="tutorialLink" placeholder="https://youtube.com/..."></div>
+        <div class="form-group"><label>Support Channel Link</label><input type="text" id="supportLink" placeholder="https://t.me/your_group"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-cyan"><i class="fas fa-money-bill-wave"></i></div>
+            Withdrawal System
+          </div>
+        </div>
+        <div class="form-group"><label>Minimum Withdraw Amount</label><input type="number" id="minWithdraw" placeholder="10"></div>
+        <div class="form-group"><label>Withdraw Notice Text</label><textarea id="withdrawNotice" rows="2" placeholder="Payment will be sent in 30 minutes"></textarea></div>
+        <div class="form-group"><label>Payment Methods</label><input type="text" id="paymentMethods" placeholder="Bkash, Nagad, Binance"></div>
+        
+        <div style="margin-top:18px; padding:14px; background:linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.05)); border-radius:14px; border:1.5px solid rgba(99,102,241,0.15);">
+          <div style="font-size:0.9rem; color:var(--primary); margin-bottom:10px; font-weight:800; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-layer-group"></i> Withdraw Levels
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:12px; font-weight:600;">Each level defines required referrals, fee, amount range and processing time.</p>
+          <div id="withdrawLevelsContainer"></div>
+          <button class="btn btn-green btn-small" onclick="addWithdrawLevel()" style="margin-top:8px;"><i class="fas fa-plus"></i> Add Level</button>
+        </div>
+      </div>
+
+      <button class="btn" onclick="saveSettings()"><i class="fas fa-save"></i> Save All Settings</button>
     </div>
 
-    <!-- ================= CHANNELS TAB (ENHANCED) ================= -->
+    <!-- ================= CHANNELS TAB ================= -->
     <div id="tab-channels" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-link"></i> Channel Links for Verification</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-info"><i class="fas fa-link"></i></div>
+            Verification Channels
+          </div>
+        </div>
         <div class="alert-box info">
           <i class="fas fa-info-circle"></i>
-          <div>ইউজারদের অবশ্যই সব চ্যানেলে জয়েন করতে হবে। চ্যানেল পরিবর্তন করলে ইউজারদের আবার ভেরিফাই করতে হবে।</div>
+          <div>Users must join all channels to access the app. Adding/removing channels will require all users to re-verify.</div>
         </div>
         <div id="channelLinksContainer"></div>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <input type="text" id="newChannelLabel" placeholder="Channel Name" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
-          <input type="text" id="newChannelId" placeholder="Chat ID/Username" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px;">
-          <button class="btn btn-green btn-small" onclick="addChannelLink()"><i class="fas fa-plus"></i> Add</button>
+        <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+          <input type="text" id="newChannelLabel" placeholder="Channel Name" style="flex:1; min-width:120px;">
+          <input type="text" id="newChannelId" placeholder="Chat ID" style="flex:1; min-width:120px;">
+          <button class="btn btn-green btn-small" onclick="addChannelLink()" style="flex:0 0 auto;"><i class="fas fa-plus"></i> Add</button>
         </div>
-        <button class="btn" onclick="saveChannelsAndForceReverify()" style="margin-top:15px; background: linear-gradient(135deg, #f39c12, #e67e22);">
-          <i class="fas fa-save"></i> Save Channels & Force Re-Verify All Users
+        <button class="btn btn-warning" onclick="saveChannelsAndForceReverify()" style="margin-top:16px;">
+          <i class="fas fa-shield-halved"></i> Save & Force Re-Verify All Users
         </button>
         <div class="alert-box warning" style="margin-top:12px;">
           <i class="fas fa-exclamation-triangle"></i>
-          <div><b>Force Re-Verify:</b> এই বাটনে ক্লিক করলে সব ইউজারের <code>channelVerified</code> স্ট্যাটাস <code>false</code> হয়ে যাবে এবং তারা পরের বার অ্যাপ খুললে আবার সব চ্যানেলে জয়েন করতে হবে।</div>
+          <div><b>Force Re-Verify:</b> All users' verification status will reset. They must rejoin all channels on next open.</div>
         </div>
       </div>
 
       <div class="card">
-        <h3><i class="fas fa-users-check"></i> Verification Stats</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-success"><i class="fas fa-chart-simple"></i></div>
+            Verification Stats
+          </div>
+        </div>
         <div class="stats-grid">
-          <div class="stat-card"><div class="num" id="totalVerifiedUsers">0</div><div class="label">Verified Users</div></div>
+          <div class="stat-card green"><div class="num" id="totalVerifiedUsers">0</div><div class="label">Verified Users</div></div>
           <div class="stat-card danger"><div class="num" id="totalNotVerifiedUsers">0</div><div class="label">Not Verified</div></div>
         </div>
-        <button class="btn btn-small btn-info" onclick="loadVerificationStats()" style="width:auto;"><i class="fas fa-sync"></i> Refresh</button>
+        <button class="btn btn-info btn-small" onclick="loadVerificationStats()"><i class="fas fa-rotate"></i> Refresh Stats</button>
       </div>
 
       <div class="card">
-        <h3><i class="fas fa-list"></i> Current Channels</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-purple"><i class="fas fa-list"></i></div>
+            Active Channels
+          </div>
+        </div>
         <div id="currentChannelsList"></div>
       </div>
 
       <div class="card">
-        <h3><i class="fas fa-user-slash"></i> Not-Verified Users (Top 20)</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-danger"><i class="fas fa-user-slash"></i></div>
+            Not-Verified Users (Top 20)
+          </div>
+        </div>
         <div class="alert-box warning">
           <i class="fas fa-info-circle"></i>
-          <div>এই ইউজাররা বর্তমানে সব চ্যানেলে জয়েন না থাকায় অ্যাপে ঢুকতে পারছেন না।</div>
+          <div>These users can't access the app until they join all channels.</div>
         </div>
         <div id="notVerifiedUsersList">Loading...</div>
       </div>
@@ -237,33 +1196,44 @@
     <!-- ================= ANALYTICS TAB ================= -->
     <div id="tab-analytics" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-chart-line"></i> Ad Activity Overview</h3>
-        <div class="stats-grid" id="analyticsStats">
-          <div class="stat-card"><div class="num" id="totalUsers">0</div><div class="label">Total Users</div></div>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-primary"><i class="fas fa-chart-line"></i></div>
+            Ad Activity Overview
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card info"><div class="num" id="totalUsers">0</div><div class="label">Total Users</div></div>
           <div class="stat-card green"><div class="num" id="totalAdViews">0</div><div class="label">Total Ad Views</div></div>
           <div class="stat-card warning"><div class="num" id="totalAdClicks">0</div><div class="label">Total Ad Clicks</div></div>
           <div class="stat-card danger"><div class="num" id="avgClickRate">0%</div><div class="label">Avg Click Rate</div></div>
         </div>
-        <div style="overflow-x:auto;">
+        <div style="overflow-x:auto; margin-top:8px;">
           <table class="activity-table">
-            <thead><tr><th>User</th><th>Views</th><th>Clicks</th><th>Click Rate</th><th>Last Active</th></tr></thead>
+            <thead><tr><th>User</th><th>Views</th><th>Clicks</th><th>Rate</th><th>Last</th></tr></thead>
             <tbody id="analyticsTableBody">
-              <tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">Loading data...</td></tr>
+              <tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:600;">Loading data...</td></tr>
             </tbody>
           </table>
         </div>
-        <button class="btn btn-small btn-info" onclick="refreshAnalytics()" style="width:auto; margin-top:10px;"><i class="fas fa-sync"></i> Refresh</button>
+        <button class="btn btn-info btn-small" onclick="refreshAnalytics()" style="margin-top:14px;"><i class="fas fa-rotate"></i> Refresh Analytics</button>
       </div>
     </div>
 
-    <!-- ================= USERS TAB (ENHANCED) ================= -->
+    <!-- ================= USERS TAB ================= -->
     <div id="tab-users" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-users"></i> All Users</h3>
-        <div class="search-box">
-          <input type="text" id="userSearch" placeholder="Search by ID or Name..." oninput="filterUsers()">
-          <button class="btn btn-small" onclick="refreshUsers()"><i class="fas fa-sync"></i></button>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-primary"><i class="fas fa-users"></i></div>
+            All Users
+          </div>
         </div>
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="userSearch" placeholder="Search by ID or Name..." oninput="filterUsers()">
+        </div>
+        <button class="btn btn-info btn-small" onclick="refreshUsers()" style="margin-bottom:14px;"><i class="fas fa-rotate"></i> Refresh List</button>
         <div id="usersContainer">Loading users...</div>
       </div>
     </div>
@@ -271,11 +1241,21 @@
     <!-- ================= WITHDRAWALS TAB ================= -->
     <div id="tab-withdrawals" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-hourglass-half"></i> Pending Requests</h3>
-        <div id="wd-container">Loading requests...</div>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-warning"><i class="fas fa-hourglass-half"></i></div>
+            Pending Requests
+          </div>
+        </div>
+        <div id="wd-container">Loading...</div>
       </div>
       <div class="card">
-        <h3><i class="fas fa-history"></i> All Withdrawals</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-info"><i class="fas fa-clock-rotate-left"></i></div>
+            All Withdrawals
+          </div>
+        </div>
         <div id="allWdContainer">Loading...</div>
       </div>
     </div>
@@ -283,22 +1263,39 @@
     <!-- ================= ADS & TASKS TAB ================= -->
     <div id="tab-ads" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-bullhorn"></i> Ad Networks Config</h3>
-        <div class="form-group"><label>Daily Ad Viewing Limit (Per Slot)</label><input type="number" id="dailyAdLimit" placeholder="10"></div>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-primary"><i class="fas fa-bullhorn"></i></div>
+            Ad Networks Config
+          </div>
+        </div>
+        <div class="form-group"><label>Daily Ad Viewing Limit</label><input type="number" id="dailyAdLimit" placeholder="10"></div>
         <div class="form-group"><label>Reward Per Ad Watch</label><input type="number" step="0.01" id="adReward" placeholder="0.5"></div>
         <div id="adsContainer"></div>
         <button class="btn" onclick="saveAds()"><i class="fas fa-save"></i> Save Ad Settings</button>
       </div>
+
       <div class="card">
-        <h3><i class="fas fa-plus-circle"></i> Add New Task</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-success"><i class="fas fa-plus-circle"></i></div>
+            Add New Task
+          </div>
+        </div>
         <div class="form-group"><label>Task Name</label><input type="text" id="taskName" placeholder="Subscribe Channel"></div>
         <div class="form-group"><label>Reward Amount</label><input type="number" id="taskReward" placeholder="5"></div>
-        <div class="form-group"><label>Action URL (Link)</label><input type="text" id="taskUrl" placeholder="https://t.me/..."></div>
-        <div class="form-group"><label>Icon Image URL (Optional)</label><input type="text" id="taskIcon" placeholder="https://.../icon.png"></div>
+        <div class="form-group"><label>Action URL</label><input type="text" id="taskUrl" placeholder="https://t.me/..."></div>
+        <div class="form-group"><label>Icon URL (Optional)</label><input type="text" id="taskIcon" placeholder="https://.../icon.png"></div>
         <button class="btn btn-green" onclick="addTask()"><i class="fas fa-plus"></i> Add Task</button>
       </div>
+
       <div class="card">
-        <h3><i class="fas fa-list-check"></i> Existing Tasks</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-warning"><i class="fas fa-list-check"></i></div>
+            Existing Tasks
+          </div>
+        </div>
         <div id="tasksList"></div>
       </div>
     </div>
@@ -306,7 +1303,12 @@
     <!-- ================= MAINTENANCE TAB ================= -->
     <div id="tab-maintenance" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-tools"></i> System Maintenance</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-warning"><i class="fas fa-wrench"></i></div>
+            System Maintenance
+          </div>
+        </div>
         <div class="form-group">
           <label>Maintenance Mode</label>
           <select id="maintenanceMode">
@@ -320,39 +1322,50 @@
       </div>
     </div>
 
-    <!-- ================= REFERRALS TAB (ENHANCED) ================= -->
+    <!-- ================= REFERRALS TAB ================= -->
     <div id="tab-referrals" class="tab-content">
       <div class="card">
-        <h3><i class="fas fa-trophy"></i> Top Referrers (Qualified)</h3>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-warning"><i class="fas fa-trophy"></i></div>
+            Top Referrers
+          </div>
+        </div>
         <div class="alert-box success">
           <i class="fas fa-check-circle"></i>
-          <div>শুধুমাত্র <b id="minRefBalNote">20+</b> TK ব্যালেন্স আছে এমন ইউজারদের qualified referral হিসেবে গোনা হচ্ছে।</div>
+          <div>Only <b id="minRefBalNote">20+</b> TK balance users count as qualified referrals.</div>
         </div>
         <div id="adminRefLeaderboard">
-          <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
+          <div class="empty-state"><div class="icon"><i class="fas fa-users"></i></div><p>Loading...</p></div>
         </div>
       </div>
+
       <div class="card">
-        <h3><i class="fas fa-users"></i> All Referral Stats</h3>
-        <div id="adminRefStats">
-          <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-primary"><i class="fas fa-chart-simple"></i></div>
+            Referral Statistics
+          </div>
         </div>
+        <div id="adminRefStats"></div>
       </div>
+
       <div class="card">
-        <h3><i class="fas fa-list"></i> Referral Details (Recent)</h3>
-        <div id="referralDetailsList">
-          <p style="text-align:center; color:#999; padding:20px;">Loading...</p>
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon icon-info"><i class="fas fa-list-ul"></i></div>
+            Recent Referral Details
+          </div>
         </div>
+        <div id="referralDetailsList"></div>
       </div>
-      <button class="btn btn-green" onclick="refreshReferralStats()"><i class="fas fa-sync"></i> Refresh Referral Stats</button>
+
+      <button class="btn btn-green" onclick="refreshReferralStats()"><i class="fas fa-rotate"></i> Refresh Referral Stats</button>
     </div>
 
   </div>
 
   <script>
-    // ===================================================
-    // ✅ FIREBASE CONFIG
-    // ===================================================
     const firebaseConfig = {
       apiKey: "AIzaSyC_WvNxSQQ58TcJhDcBw5NUrAZjOQe1T2g",
       authDomain: "cat-coins-34d4c.firebaseapp.com",
@@ -404,26 +1417,23 @@
       if(id === 'referrals') loadReferralStats();
       if(id === 'analytics') loadAnalytics();
       if(id === 'channels') { loadVerificationStats(); loadNotVerifiedUsers(); renderCurrentChannels(); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ===================================================
-    // ✅ CHANNEL LINKS MANAGEMENT
-    // ===================================================
+    // ===== CHANNELS =====
     function renderChannelLinks() {
       const container = document.getElementById('channelLinksContainer');
       if (!channelLinks.length) {
-        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px;">No channels added yet.</p>';
+        container.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:16px; font-weight:600; font-size:0.85rem;">No channels added yet.</p>';
         return;
       }
       let html = '';
       channelLinks.forEach((link, index) => {
-        html += `
-          <div class="channel-item">
-            <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
-            <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
-            <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})"><i class="fas fa-trash"></i></button>
-          </div>
-        `;
+        html += `<div class="channel-item">
+          <input type="text" value="${link.label}" id="channelLabel_${index}" placeholder="Label" style="flex:1;">
+          <input type="text" value="${link.chatId}" id="channelId_${index}" placeholder="Chat ID" style="flex:1;">
+          <button class="btn btn-red btn-small" onclick="removeChannelLink(${index})" style="flex:0 0 auto; padding:8px 10px;"><i class="fas fa-trash"></i></button>
+        </div>`;
       });
       container.innerHTML = html;
     }
@@ -431,15 +1441,17 @@
     function renderCurrentChannels() {
       const container = document.getElementById('currentChannelsList');
       if (!channelLinks.length) {
-        container.innerHTML = '<p style="color:#999; text-align:center;">No channels configured.</p>';
+        container.innerHTML = '<p style="color:#94a3b8; text-align:center; font-weight:600;">No channels configured.</p>';
         return;
       }
       let html = '';
       channelLinks.forEach(link => {
         html += `<div class="channel-verified-item">
           <i class="fa-brands fa-telegram"></i>
-          <div class="ch-name">${link.label}</div>
-          <div class="ch-id">@${link.chatId}</div>
+          <div class="ch-info">
+            <div class="ch-name">${link.label}</div>
+            <div class="ch-id">@${link.chatId}</div>
+          </div>
         </div>`;
       });
       container.innerHTML = html;
@@ -453,20 +1465,17 @@
       renderChannelLinks();
       document.getElementById('newChannelLabel').value = '';
       document.getElementById('newChannelId').value = '';
-      toast('Channel added! Click "Save Channels" to apply.');
+      toast('Channel added! Click "Save & Force Re-Verify" to apply.');
     }
 
     function removeChannelLink(index) {
       channelLinks.splice(index, 1);
       renderChannelLinks();
-      toast('Channel removed! Click "Save Channels" to apply.');
+      toast('Channel removed! Save to apply changes.');
     }
 
-    // ✅ NEW: Save channels + force re-verify all users
     async function saveChannelsAndForceReverify() {
       if (!confirm('⚠️ This will save channels AND force re-verification for ALL users. Continue?')) return;
-      
-      // Collect channel data from UI
       const newChannelLinks = [];
       channelLinks.forEach((link, index) => {
         const labelEl = document.getElementById(`channelLabel_${index}`);
@@ -475,56 +1484,36 @@
           newChannelLinks.push({ label: labelEl.value.trim(), chatId: chatIdEl.value.trim() });
         }
       });
-      
-      if (newChannelLinks.length === 0) {
-        toast('❌ No channels to save!');
-        return;
-      }
-      
+      if (newChannelLinks.length === 0) return toast('❌ No channels to save!');
       try {
         toast('⏳ Saving channels...');
-        
-        // 1. Save channels to config
         await db.ref('config/channelLinks').set(newChannelLinks);
         channelLinks = newChannelLinks;
-        
-        // 2. Force re-verify all users: set channelVerified = false, clear verifiedChannels
         toast('⏳ Force re-verifying users...');
-        
         const usersSnap = await db.ref('users').once('value');
         const updates = {};
         let count = 0;
-        
         usersSnap.forEach(child => {
           updates[child.key + '/channelVerified'] = false;
           updates[child.key + '/verifiedChannels'] = null;
           count++;
         });
-        
-        if (count > 0) {
-          await db.ref('users').update(updates);
-        }
-        
+        if (count > 0) await db.ref('users').update(updates);
         toast(`✅ Saved! ${count} users will re-verify on next open.`);
         loadVerificationStats();
         loadNotVerifiedUsers();
         renderCurrentChannels();
       } catch(e) {
-        console.error(e);
         toast('❌ Error: ' + e.message);
       }
     }
 
-    // ===================================================
-    // ✅ VERIFICATION STATS
-    // ===================================================
     async function loadVerificationStats() {
       try {
         const snap = await db.ref('users').once('value');
         let verified = 0, notVerified = 0;
         snap.forEach(child => {
-          const u = child.val();
-          if (u.channelVerified === true) verified++;
+          if (child.val().channelVerified === true) verified++;
           else notVerified++;
         });
         document.getElementById('totalVerifiedUsers').textContent = verified;
@@ -534,7 +1523,7 @@
 
     async function loadNotVerifiedUsers() {
       const container = document.getElementById('notVerifiedUsersList');
-      container.innerHTML = '<p style="text-align:center; color:#999; padding:15px;">Loading...</p>';
+      container.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:16px; font-weight:600;">Loading...</p>';
       try {
         const snap = await db.ref('users').once('value');
         let list = [];
@@ -546,54 +1535,48 @@
         });
         list.sort((a,b) => (b.lastActive > a.lastActive ? 1 : -1));
         if (list.length === 0) {
-          container.innerHTML = '<div class="alert-box success"><i class="fas fa-check-circle"></i><div>সব ইউজার verified! ✅</div></div>';
+          container.innerHTML = '<div class="alert-box success"><i class="fas fa-check-circle"></i><div>All users verified! ✅</div></div>';
           return;
         }
         let html = '';
         list.slice(0, 20).forEach(u => {
-          html += `<div style="display:flex; justify-content:space-between; padding:10px 12px; background:#fff8f8; border:1px solid #ffe0e0; border-radius:10px; margin-bottom:8px;">
+          html += `<div class="nv-user-item">
             <div>
-              <div style="font-weight:700; font-size:0.85rem;">${u.name}</div>
-              <div style="font-size:0.7rem; color:#999;">ID: ${u.id}</div>
+              <div class="nv-user-name">${u.name}</div>
+              <div class="nv-user-id">ID: ${u.id}</div>
             </div>
-            <div style="font-size:0.7rem; color:#888;">Last: ${u.lastActive}</div>
+            <div class="nv-user-last">Last: ${u.lastActive}</div>
           </div>`;
         });
-        if (list.length > 20) {
-          html += `<p style="text-align:center; color:#888; font-size:0.8rem;">+ ${list.length - 20} more...</p>`;
-        }
+        if (list.length > 20) html += `<p style="text-align:center; color:#94a3b8; font-size:0.8rem; margin-top:8px; font-weight:600;">+ ${list.length - 20} more...</p>`;
         container.innerHTML = html;
       } catch(e) {
-        container.innerHTML = '<p style="text-align:center; color:#e74c3c;">Error loading</p>';
+        container.innerHTML = '<p style="text-align:center; color:#ef4444; font-weight:600;">Error loading</p>';
       }
     }
 
-    // ===================================================
-    // ✅ WITHDRAW LEVELS
-    // ===================================================
+    // ===== WITHDRAW LEVELS =====
     function renderWithdrawLevels() {
       const container = document.getElementById('withdrawLevelsContainer');
       if (!withdrawLevels.length) {
-        container.innerHTML = '<p style="color:#999; text-align:center; padding:10px; font-size:0.85rem;">No levels configured.</p>';
+        container.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:10px; font-size:0.82rem; font-weight:600;">No levels configured.</p>';
         return;
       }
       let html = '';
       withdrawLevels.forEach((level, index) => {
-        html += `
-          <div class="level-edit-item">
-            <div class="level-header">
-              <span class="level-num">Level ${index + 1}</span>
-              <button class="btn btn-red btn-small" onclick="removeWithdrawLevel(${index})" style="width:auto; padding:4px 10px; font-size:0.7rem;"><i class="fas fa-trash"></i></button>
-            </div>
-            <div class="level-fields">
-              <input type="number" value="${level.requiredRefs}" id="wl_refs_${index}" placeholder="Refs" style="width:60px;">
-              <input type="number" value="${level.fee}" id="wl_fee_${index}" placeholder="Fee %" style="width:60px;">
-              <input type="number" value="${level.minAmount}" id="wl_min_${index}" placeholder="Min" style="width:70px;">
-              <input type="number" value="${level.maxAmount}" id="wl_max_${index}" placeholder="Max" style="width:70px;">
-              <input type="text" value="${level.time}" id="wl_time_${index}" placeholder="Time" class="wide" style="width:100px;">
-            </div>
+        html += `<div class="level-edit-item">
+          <div class="level-header">
+            <span class="level-num">Level ${index + 1}</span>
+            <button class="btn btn-red btn-small" onclick="removeWithdrawLevel(${index})" style="padding:5px 9px; font-size:0.7rem;"><i class="fas fa-trash"></i></button>
           </div>
-        `;
+          <div class="level-fields">
+            <input type="number" value="${level.requiredRefs}" id="wl_refs_${index}" placeholder="Refs">
+            <input type="number" value="${level.fee}" id="wl_fee_${index}" placeholder="Fee %">
+            <input type="number" value="${level.minAmount}" id="wl_min_${index}" placeholder="Min">
+            <input type="number" value="${level.maxAmount}" id="wl_max_${index}" placeholder="Max">
+            <input type="text" value="${level.time}" id="wl_time_${index}" placeholder="Time" class="wide">
+          </div>
+        </div>`;
       });
       container.innerHTML = html;
     }
@@ -601,15 +1584,15 @@
     function addWithdrawLevel() {
       withdrawLevels.push({ requiredRefs: 5, fee: 5, minAmount: 10, maxAmount: 100, time: "30 Min-1 Hours" });
       renderWithdrawLevels();
-      toast('Level added! Save settings to apply.');
+      toast('Level added! Save to apply.');
     }
 
     function removeWithdrawLevel(index) {
-      if (withdrawLevels.length <= 1) { toast('Cannot remove last level!'); return; }
+      if (withdrawLevels.length <= 1) return toast('Cannot remove last level!');
       if(confirm('Remove this level?')) {
         withdrawLevels.splice(index, 1);
         renderWithdrawLevels();
-        toast('Level removed! Save settings to apply.');
+        toast('Level removed! Save to apply.');
       }
     }
 
@@ -621,20 +1604,17 @@
         const minAmt = parseFloat(document.getElementById(`wl_min_${index}`).value) || 10;
         const maxAmt = parseFloat(document.getElementById(`wl_max_${index}`).value) || 100;
         const time = document.getElementById(`wl_time_${index}`).value || "30 Min-1 Hours";
-        levels.push({ requiredRefs: refs, fee: fee, minAmount: minAmt, maxAmount: maxAmt, time: time });
+        levels.push({ requiredRefs: refs, fee, minAmount: minAmt, maxAmount: maxAmt, time });
       });
       return levels;
     }
 
-    // ===================================================
-    // ✅ READ CONFIG
-    // ===================================================
+    // ===== READ CONFIG =====
     db.ref('config').on('value', snap => {
       if(snap.exists()) {
         configData = snap.val();
         if(!configData.adSlots) configData.adSlots = [{},{},{},{}];
         if(!configData.webTasks) configData.webTasks = {};
-        
         channelLinks = configData.channelLinks || [
           {label:'NexEarn Channel', chatId:'nexearn2'},
           {label:'NexEarn Adda', chatId:'nexearn2_adda'},
@@ -642,7 +1622,6 @@
           {label:'NexEarn Payment', chatId:'nexearn2_payment'}
         ];
         renderChannelLinks();
-        
         withdrawLevels = configData.withdrawLevels || [
           { requiredRefs: 5, fee: 5, minAmount: 10, maxAmount: 100, time: "30 Min-1 Hours" },
           { requiredRefs: 7, fee: 4, minAmount: 10, maxAmount: 200, time: "30 Min-1 Hours" },
@@ -651,7 +1630,6 @@
           { requiredRefs: 7, fee: 1, minAmount: 10, maxAmount: 500, time: "30 Min-1 Hours" }
         ];
         renderWithdrawLevels();
-        
         document.getElementById('botUsername').value = configData.botUsername || '';
         document.getElementById('currencySymbol').value = configData.currencySymbol || 'TK';
         document.getElementById('dailyBonusAmount').value = configData.dailyBonusAmount || 20;
@@ -665,23 +1643,19 @@
         document.getElementById('withdrawNotice').value = configData.withdrawNotice || '';
         document.getElementById('paymentMethods').value = configData.paymentMethods ? configData.paymentMethods.join(', ') : 'Bkash, Nagad';
         document.getElementById('adResetHour').value = configData.adResetHour || 0;
-        
         document.getElementById('dailyAdLimit').value = configData.dailyAdLimit || 10;
         document.getElementById('adReward').value = configData.adReward || 0.5;
-
         if(configData.maintenance) {
           document.getElementById('maintenanceMode').value = configData.maintenance.active ? 'true' : 'false';
           document.getElementById('maintenanceMsg').value = configData.maintenance.message || '';
           document.getElementById('maintenanceTime').value = configData.maintenance.estimatedMinutes || '';
         }
-
         let adHtml = '';
         for(let i=0; i<4; i++) {
           let slot = configData.adSlots[i] || { network: 'none', id: '' };
-          adHtml += `
-          <div style="background:#f9f9f9; padding:15px; border-radius:12px; border:1px solid #e1e1e1; margin-bottom:12px;">
-            <b style="color:var(--primary); font-size:1rem;"><i class="fas fa-layer-group"></i> Slot ${i+1}</b>
-            <select id="adNet_${i}" style="margin:10px 0;">
+          adHtml += `<div class="ad-slot-box">
+            <div class="ad-slot-header"><i class="fas fa-layer-group"></i> Slot ${i+1}</div>
+            <select id="adNet_${i}" style="margin:8px 0;">
               <option value="none" ${slot.network==='none'?'selected':''}>Disabled (None)</option>
               <option value="adsgram" ${slot.network==='adsgram'?'selected':''}>Adsgram</option>
               <option value="monetag" ${slot.network==='monetag'?'selected':''}>Monetag</option>
@@ -691,17 +1665,15 @@
           </div>`;
         }
         document.getElementById('adsContainer').innerHTML = adHtml;
-
         let taskHtml = '';
         const tasks = configData.webTasks;
-        if(Object.keys(tasks).length === 0) taskHtml = '<p style="font-size:0.9rem; color:#777; text-align:center;">No tasks found.</p>';
+        if(Object.keys(tasks).length === 0) taskHtml = '<p style="font-size:0.85rem; color:#94a3b8; text-align:center; font-weight:600; padding:16px;">No tasks found.</p>';
         Object.keys(tasks).forEach(k => {
           let t = tasks[k];
-          taskHtml += `
-          <div style="border-bottom:1px solid #eee; padding-bottom:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <b style="color:var(--text); font-size:1rem;">${t.name}</b> <span style="color:var(--primary); font-weight:800; background:rgba(108,92,231,0.1); padding:2px 8px; border-radius:8px;">+${t.reward}</span><br>
-              <small style="color:#777; word-break:break-all;">${t.url}</small>
+          taskHtml += `<div class="task-admin-item">
+            <div class="task-admin-info">
+              <div class="name">${t.name}<span class="reward">+${t.reward}</span></div>
+              <div class="url">${t.url}</div>
             </div>
             <button class="btn btn-red btn-small" onclick="deleteTask('${k}')"><i class="fas fa-trash"></i></button>
           </div>`;
@@ -710,13 +1682,10 @@
       }
     });
 
-    // ===================================================
-    // ✅ SAVE SETTINGS
-    // ===================================================
+    // ===== SAVE =====
     function saveSettings() {
       let methods = document.getElementById('paymentMethods').value.split(',').map(m => m.trim());
       const levels = getWithdrawLevelsFromUI();
-      
       db.ref('config').update({
         botUsername: document.getElementById('botUsername').value,
         currencySymbol: document.getElementById('currencySymbol').value,
@@ -734,7 +1703,7 @@
         withdrawLevels = levels;
         MIN_REFERRAL_BALANCE = Number(document.getElementById('minReferralBalance').value) || 20;
         document.getElementById('minRefBalNote').textContent = MIN_REFERRAL_BALANCE + '+';
-        toast('Settings Saved Successfully!');
+        toast('✅ Settings Saved!');
       });
     }
 
@@ -747,7 +1716,7 @@
         dailyAdLimit: Number(document.getElementById('dailyAdLimit').value),
         adReward: Number(document.getElementById('adReward').value),
         adSlots: slots
-      }).then(() => toast('Ad Settings Saved!'));
+      }).then(() => toast('✅ Ad Settings Saved!'));
     }
 
     function addTask() {
@@ -758,14 +1727,14 @@
         url: document.getElementById('taskUrl').value,
         icon: document.getElementById('taskIcon').value || 'https://via.placeholder.com/45'
       };
-      if(!data.name || !data.url || !data.reward) return toast('Please fill Name, Reward & URL');
-      db.ref('config/webTasks/' + id).set(data).then(() => { 
-        toast('Task Added Successfully'); 
+      if(!data.name || !data.url || !data.reward) return toast('Please fill all fields');
+      db.ref('config/webTasks/' + id).set(data).then(() => {
+        toast('✅ Task Added!');
         ['taskName','taskReward','taskUrl','taskIcon'].forEach(i => document.getElementById(i).value = '');
       });
     }
 
-    function deleteTask(id) { 
+    function deleteTask(id) {
       if(confirm('Delete this task?')) db.ref('config/webTasks/' + id).remove().then(() => toast('Task Deleted!'));
     }
 
@@ -775,12 +1744,10 @@
         active: active,
         message: document.getElementById('maintenanceMsg').value,
         estimatedMinutes: Number(document.getElementById('maintenanceTime').value) || 30
-      }).then(() => toast('Maintenance settings updated!'));
+      }).then(() => toast('✅ Maintenance Updated!'));
     }
 
-    // ===================================================
-    // ✅ USERS MANAGEMENT (ENHANCED with qualified refs)
-    // ===================================================
+    // ===== USERS =====
     async function loadUsers() {
       try {
         const snap = await db.ref('users').once('value');
@@ -790,22 +1757,19 @@
           u.id = child.key;
           allUsers.push(u);
         });
-        // Compute qualified refs for each user
         await Promise.all(allUsers.map(async (u) => {
           const refs = u.referredUsers || {};
           const keys = Object.keys(refs);
           let qualified = 0;
           if (keys.length > 0) {
-            const checks = keys.map(async (rid) => {
+            await Promise.all(keys.map(async (rid) => {
               const bSnap = await db.ref('users/' + rid + '/balance').once('value');
               const bal = bSnap.exists() ? Number(bSnap.val() || 0) : 0;
               if (bal >= MIN_REFERRAL_BALANCE) qualified++;
-            });
-            await Promise.all(checks);
+            }));
           }
           u._qualifiedRefs = qualified;
           u._totalRefs = keys.length;
-          // Count ad views
           let views = 0;
           const da = u.dailyAds || {};
           for (let k in da) views += Number(da[k]) || 0;
@@ -828,7 +1792,7 @@
     function renderUsers() {
       const container = document.getElementById('usersContainer');
       if(filteredUsers.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No users found.</p>';
+        container.innerHTML = '<div class="empty-state"><div class="icon"><i class="fas fa-user-slash"></i></div><p>No users found</p></div>';
         return;
       }
       let html = '';
@@ -838,28 +1802,36 @@
         const wdCount = u.withdrawCount || 0;
         const refs = u._qualifiedRefs || 0;
         const level = getReferralLevel(refs);
-        html += `
-        <div class="user-card">
-          <div class="user-info">
-            <div class="name">${u.name || 'Unknown'} 
+        const initial = (u.name || 'U').charAt(0).toUpperCase();
+        html += `<div class="user-card">
+          <div class="user-header">
+            <div class="user-avatar-row">
+              <div class="user-avatar">${initial}</div>
+              <div style="min-width:0; flex:1;">
+                <div class="user-name">${u.name || 'Unknown'}</div>
+                <div class="user-id">ID: ${u.id}</div>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
               <span class="status-badge ${isBanned ? 'banned' : 'active'}">${isBanned ? '🚫 Banned' : '✅ Active'}</span>
               <span class="status-badge ${isVerified ? 'verified' : 'notverified'}">${isVerified ? '✅ Verified' : '❌ Not Verified'}</span>
             </div>
-            <div class="id">ID: ${u.id} | Withdraws: ${wdCount}</div>
-            <div class="bal">💰 Balance: ${configData.currencySymbol || 'TK'} ${(u.balance || 0).toFixed(2)} <span class="ref-level-badge ${level.class}">${level.label}</span></div>
-            
-            <div class="user-stats-grid">
-              <div class="user-stat-mini green"><span class="val">${refs}</span>Qualified Refs</div>
-              <div class="user-stat-mini"><span class="val">${u._adViews || 0}</span>Ad Views</div>
-              <div class="user-stat-mini"><span class="val">${u._adClicks || 0}</span>Ad Clicks</div>
-            </div>
           </div>
-          <div class="user-actions" style="margin-top:10px;">
-            <button class="btn btn-green btn-small" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i> Bal</button>
+          <div class="user-balance-row">
+            <span class="user-balance">💰 ${(u.balance || 0).toFixed(2)} ${configData.currencySymbol || 'TK'}</span>
+            <span class="ref-level-badge ${level.class}">${level.label}</span>
+          </div>
+          <div class="user-stats-grid">
+            <div class="user-stat-mini green"><span class="val">${refs}</span><div class="lbl">Refs</div></div>
+            <div class="user-stat-mini"><span class="val">${u._adViews || 0}</span><div class="lbl">Views</div></div>
+            <div class="user-stat-mini"><span class="val">${u._adClicks || 0}</span><div class="lbl">Clicks</div></div>
+          </div>
+          <div class="user-actions">
+            <button class="btn btn-green btn-small" onclick="editUser('${u.id}')"><i class="fas fa-pen"></i> Balance</button>
             <button class="btn ${isBanned ? 'btn-green' : 'btn-warning'} btn-small" onclick="toggleBan('${u.id}', ${!isBanned})">
-              <i class="fas ${isBanned ? 'fa-check' : 'fa-ban'}"></i> ${isBanned ? 'Unban' : 'Ban'}
+              <i class="fas ${isBanned ? 'fa-unlock' : 'fa-ban'}"></i> ${isBanned ? 'Unban' : 'Ban'}
             </button>
-            <button class="btn btn-info btn-small" onclick="forceReverifyUser('${u.id}')"><i class="fas fa-redo"></i> Re-verify</button>
+            <button class="btn btn-info btn-small" onclick="forceReverifyUser('${u.id}')"><i class="fas fa-rotate"></i> Verify</button>
             <button class="btn btn-red btn-small" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
           </div>
         </div>`;
@@ -874,22 +1846,17 @@
       if(!user) return;
       const newBal = prompt(`Enter new balance for ${user.name || userId}:`, user.balance || 0);
       if(newBal !== null && !isNaN(newBal)) {
-        db.ref('users/' + userId + '/balance').set(Number(newBal)).then(() => {
-          toast('Balance updated!'); loadUsers();
-        });
+        db.ref('users/' + userId + '/balance').set(Number(newBal)).then(() => { toast('Balance updated!'); loadUsers(); });
       }
     }
 
     function toggleBan(userId, ban) {
       const action = ban ? 'ban' : 'unban';
       if(confirm(`Are you sure you want to ${action} this user?`)) {
-        db.ref('users/' + userId).update({ isBanned: ban }).then(() => {
-          toast(`User ${action}ned!`); loadUsers();
-        });
+        db.ref('users/' + userId).update({ isBanned: ban }).then(() => { toast(`User ${action}ned!`); loadUsers(); });
       }
     }
 
-    // ✅ NEW: Force re-verify single user
     function forceReverifyUser(userId) {
       if(confirm('Force this user to re-verify all channels?')) {
         db.ref('users/' + userId).update({ channelVerified: false, verifiedChannels: null }).then(() => {
@@ -899,21 +1866,18 @@
     }
 
     function deleteUser(userId) {
-      if(confirm('⚠️ DELETE this user and all data? Cannot be undone!')) {
+      if(confirm('⚠️ DELETE this user? Cannot be undone!')) {
         db.ref('users/' + userId).remove().then(() => { toast('User deleted!'); loadUsers(); });
       }
     }
 
-    // ===================================================
-    // ✅ ANALYTICS
-    // ===================================================
+    // ===== ANALYTICS =====
     async function loadAnalytics() {
       try {
         const usersSnap = await db.ref('users').once('value');
         let userData = [];
         let totalViews = 0, totalClicks = 0;
         const today = new Date().toISOString().slice(0, 10);
-
         if (usersSnap.exists()) {
           usersSnap.forEach(child => {
             const u = child.val();
@@ -933,10 +1897,9 @@
         document.getElementById('totalAdClicks').textContent = totalClicks;
         const clickRate = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : 0;
         document.getElementById('avgClickRate').textContent = clickRate + '%';
-
         const tbody = document.getElementById('analyticsTableBody');
         if (userData.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No data yet.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:30px; font-weight:600;">No data yet</td></tr>';
           return;
         }
         let html = '';
@@ -944,25 +1907,23 @@
           const rate = u.views > 0 ? ((u.clicks / u.views) * 100).toFixed(1) : 0;
           const lastActiveStr = u.lastActive === today ? '🟢 Today' : u.lastActive;
           html += `<tr>
-            <td class="user-id">${u.name}<br><span style="font-size:0.7rem; color:#999;">${u.id}</span></td>
+            <td class="user-id">${u.name}<br><span style="font-size:0.68rem; color:#94a3b8;">${u.id}</span></td>
             <td><strong>${u.views}</strong></td>
             <td><strong>${u.clicks}</strong></td>
             <td>${rate}%</td>
-            <td style="font-size:0.75rem;">${lastActiveStr}</td>
+            <td style="font-size:0.72rem;">${lastActiveStr}</td>
           </tr>`;
         });
         tbody.innerHTML = html;
       } catch (e) {
         console.error('Analytics error:', e);
-        document.getElementById('analyticsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger);">Error loading</td></tr>';
+        document.getElementById('analyticsTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444; font-weight:600;">Error loading</td></tr>';
       }
     }
 
     function refreshAnalytics() { toast('Refreshing...'); loadAnalytics(); }
 
-    // ===================================================
-    // ✅ WITHDRAWALS
-    // ===================================================
+    // ===== WITHDRAWALS =====
     db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', snap => {
       let html = '';
       if(snap.exists()) {
@@ -972,27 +1933,26 @@
           let date = new Date(req.timestamp).toLocaleString();
           const feeText = req.fee ? `Fee: ${req.fee.toFixed(2)}` : '';
           const levelText = req.level ? `Level ${req.level}` : '';
-          html += `
-          <div class="wd-card">
-            <div class="wd-head">
-              <span style="color:#0984e3; background:rgba(9,132,227,0.1); padding:4px 10px; border-radius:8px;">${req.method}</span> 
-              <span style="color:var(--primary); font-size:1.2rem;">${req.amount}</span>
+          html += `<div class="wd-card">
+            <div class="wd-header">
+              <span class="wd-method"><i class="fas fa-credit-card"></i> ${req.method}</span>
+              <span class="wd-amount">${req.amount} TK</span>
             </div>
             <div class="wd-info">
-              <b>Account:</b> <span style="color:#d63031; font-weight:800; font-size:1.05rem;">${req.account}</span><br>
+              <b>Account:</b> <span class="wd-account">${req.account}</span><br>
               <b>User ID:</b> ${req.userId}<br>
               <b>Name:</b> ${req.userName}<br>
               <b>Level:</b> ${levelText} | ${feeText}<br>
-              <small style="color:#999;">Date: ${date}</small>
+              <small style="color:#94a3b8;">📅 ${date}</small>
             </div>
             <div class="wd-actions">
-              <button class="btn btn-green btn-small" style="flex:1" onclick="approveWd('${key}')"><i class="fas fa-check"></i> Approve</button>
-              <button class="btn btn-red btn-small" style="flex:1" onclick="rejectWd('${key}', '${req.userId}', ${req.amount})"><i class="fas fa-times"></i> Reject</button>
+              <button class="btn btn-green btn-small" onclick="approveWd('${key}')"><i class="fas fa-check"></i> Approve</button>
+              <button class="btn btn-red btn-small" onclick="rejectWd('${key}', '${req.userId}', ${req.amount})"><i class="fas fa-times"></i> Reject</button>
             </div>
           </div>`;
         });
-      } else { 
-        html = '<div style="text-align:center; padding:30px 10px; color:#888;"><i class="fas fa-check-circle" style="font-size:3rem; margin-bottom:15px; color:#00b894; opacity:0.8;"></i><br><b style="font-size:1.1rem; color:#444;">No Pending Requests!</b></div>'; 
+      } else {
+        html = '<div class="empty-state"><div class="icon"><i class="fas fa-check-circle"></i></div><p>No Pending Requests!</p></div>';
       }
       document.getElementById('wd-container').innerHTML = html;
     });
@@ -1005,26 +1965,24 @@
           snap.forEach(child => {
             let req = child.val();
             count++;
-            const statusColor = req.status === 'approved' ? '#00b894' : req.status === 'pending' ? '#f39c12' : '#ff4757';
+            const statusColor = req.status === 'approved' ? '#10b981' : req.status === 'pending' ? '#f59e0b' : '#ef4444';
+            const statusBg = req.status === 'approved' ? 'rgba(16,185,129,0.1)' : req.status === 'pending' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)';
             const feeText = req.fee ? `Fee: ${req.fee.toFixed(2)}` : '';
-            html += `
-            <div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
-              <span><b>${req.userName || 'User'}</b> (${req.userId})</span>
-              <span>${req.method} - ${req.account}</span>
-              <span style="font-weight:800; color:var(--primary);">${req.amount} ${feeText}</span>
-              <span style="color:${statusColor}; font-weight:700; background:${statusColor}15; padding:2px 10px; border-radius:12px;">${req.status}</span>
+            html += `<div style="border-bottom:1px solid #e2e8f0; padding:12px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; font-size:0.82rem;">
+              <span><b>${req.userName || 'User'}</b> <span style="color:#94a3b8;">(${req.userId})</span></span>
+              <span style="color:#475569;">${req.method} - ${req.account}</span>
+              <span style="font-weight:800; color:var(--primary);">${req.amount} TK ${feeText}</span>
+              <span style="color:${statusColor}; font-weight:800; background:${statusBg}; padding:3px 10px; border-radius:20px; font-size:0.7rem; text-transform:uppercase;">${req.status}</span>
             </div>`;
           });
-          if(count === 0) html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>';
-        } else { html = '<p style="text-align:center; color:#999;">No withdrawals found.</p>'; }
+          if(count === 0) html = '<p style="text-align:center; color:#94a3b8; font-weight:600;">No withdrawals found.</p>';
+        } else { html = '<p style="text-align:center; color:#94a3b8; font-weight:600;">No withdrawals found.</p>'; }
         document.getElementById('allWdContainer').innerHTML = html;
       });
     }
 
     function approveWd(id) {
-      if(confirm('Approve this payment?')) {
-        db.ref('withdrawals/' + id).update({ status: 'approved' }).then(() => toast('Payment Approved!'));
-      }
+      if(confirm('Approve this payment?')) db.ref('withdrawals/' + id).update({ status: 'approved' }).then(() => toast('✅ Payment Approved!'));
     }
 
     async function rejectWd(id, userId, amount) {
@@ -1037,28 +1995,23 @@
             await userRef.update({ balance: bal + Number(amount) });
           }
           await db.ref('withdrawals/' + id).update({ status: 'rejected' });
-          toast('Rejected & Refunded!');
+          toast('✅ Rejected & Refunded!');
         } catch(e) { toast('Error!'); }
       }
     }
 
-    // ===================================================
-    // ✅ REFERRAL STATS (ENHANCED with qualified count)
-    // ===================================================
+    // ===== REFERRALS =====
     async function loadReferralStats() {
       try {
         const snap = await db.ref('users').once('value');
         let users = [];
         let totalRefs = 0, totalQualifiedRefs = 0;
         let allReferralDetails = [];
-
-        // Build map of all balances first for quick lookup
         const balanceMap = {};
         snap.forEach(child => {
           const u = child.val();
           balanceMap[child.key] = Number(u.balance || 0);
         });
-
         if(snap.exists()) {
           snap.forEach(child => {
             const u = child.val();
@@ -1069,123 +2022,89 @@
             keys.forEach(rid => {
               if ((balanceMap[rid] || 0) >= MIN_REFERRAL_BALANCE) qualified++;
               allReferralDetails.push({
-                referrerId: id,
-                referrerName: u.name || 'User',
-                referredId: rid,
-                referredName: refs[rid].name || 'User',
+                referrerId: id, referrerName: u.name || 'User',
+                referredId: rid, referredName: refs[rid].name || 'User',
                 referredBalance: balanceMap[rid] || 0,
                 qualified: (balanceMap[rid] || 0) >= MIN_REFERRAL_BALANCE,
                 joinedAt: refs[rid].joinedAt || 0
               });
             });
             if (keys.length > 0) {
-              users.push({
-                id: id,
-                name: u.name || 'User',
-                totalReferrals: keys.length,
-                qualifiedReferrals: qualified,
-                balance: u.balance || 0
-              });
+              users.push({ id, name: u.name || 'User', totalReferrals: keys.length, qualifiedReferrals: qualified, balance: u.balance || 0 });
               totalRefs += keys.length;
               totalQualifiedRefs += qualified;
             }
           });
         }
-        
         users.sort((a, b) => b.qualifiedReferrals - a.qualifiedReferrals);
         const topReferrers = users.slice(0, 10);
-        
-        // Leaderboard
         const leaderContainer = document.getElementById('adminRefLeaderboard');
         if (topReferrers.length === 0) {
-          leaderContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No referrals yet.</p>';
+          leaderContainer.innerHTML = '<div class="empty-state"><div class="icon"><i class="fas fa-user-group"></i></div><p>No referrals yet</p></div>';
         } else {
           let html = '';
           const medals = ['🥇', '🥈', '🥉'];
           topReferrers.forEach((u, i) => {
             const medal = i < 3 ? medals[i] : `#${i+1}`;
             const level = getReferralLevel(u.qualifiedReferrals);
-            html += `
-            <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--bg); border-radius:12px; margin-bottom:8px; border:1px solid var(--border);">
-              <div style="font-weight:900; font-size:1.1rem; color:var(--primary); width:40px; text-align:center;">${medal}</div>
-              <div style="flex:1;">
-                <div style="font-weight:600; font-size:0.9rem;">${u.name}</div>
-                <div style="font-size:0.75rem; color:var(--text-light);">ID: ${u.id}</div>
+            html += `<div class="leaderboard-item">
+              <div class="leaderboard-medal">${medal}</div>
+              <div class="leaderboard-info">
+                <div class="leaderboard-name">${u.name}</div>
+                <div class="leaderboard-id">ID: ${u.id}</div>
+                <span class="ref-level-badge ${level.class}" style="margin-top:4px;">${level.label}</span>
               </div>
-              <div style="text-align:right;">
-                <div style="font-weight:800; color:var(--success);">✅ ${u.qualifiedReferrals}</div>
-                <div style="font-size:0.7rem; color:#888;">Total: ${u.totalReferrals}</div>
-                <span class="ref-level-badge ${level.class}" style="font-size:0.6rem;">${level.label}</span>
+              <div class="leaderboard-stats">
+                <div class="leaderboard-qualified">✅ ${u.qualifiedReferrals}</div>
+                <div class="leaderboard-total">Total: ${u.totalReferrals}</div>
               </div>
             </div>`;
           });
           leaderContainer.innerHTML = html;
         }
-        
-        // Stats
         const statsContainer = document.getElementById('adminRefStats');
         const totalUsers = snap.exists() ? snap.numChildren() : 0;
         statsContainer.innerHTML = `
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
-              <div style="font-size:1.5rem; font-weight:800; color:var(--primary);">${totalRefs}</div>
-              <div style="font-size:0.7rem; color:var(--text-light);">Total Referrals</div>
-            </div>
-            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
-              <div style="font-size:1.5rem; font-weight:800; color:var(--success);">${totalQualifiedRefs}</div>
-              <div style="font-size:0.7rem; color:var(--text-light);">Qualified (${MIN_REFERRAL_BALANCE}+ TK)</div>
-            </div>
-            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
-              <div style="font-size:1.5rem; font-weight:800; color:var(--warning);">${users.length}</div>
-              <div style="font-size:0.7rem; color:var(--text-light);">Users with Refs</div>
-            </div>
-            <div style="background:var(--bg); padding:15px; border-radius:12px; text-align:center;">
-              <div style="font-size:1.5rem; font-weight:800; color:var(--danger);">${totalUsers}</div>
-              <div style="font-size:0.7rem; color:var(--text-light);">Total Users</div>
-            </div>
+          <div class="stat-mini-grid">
+            <div class="stat-mini"><div class="num">${totalRefs}</div><div class="lbl">Total Refs</div></div>
+            <div class="stat-mini"><div class="num green">${totalQualifiedRefs}</div><div class="lbl">Qualified (${MIN_REFERRAL_BALANCE}+)</div></div>
+            <div class="stat-mini"><div class="num">${users.length}</div><div class="lbl">Users w/ Refs</div></div>
+            <div class="stat-mini"><div class="num red">${totalUsers}</div><div class="lbl">Total Users</div></div>
           </div>
         `;
-
-        // Referral details (recent 30)
         const detailContainer = document.getElementById('referralDetailsList');
         if (allReferralDetails.length === 0) {
-          detailContainer.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">No referral records yet.</p>';
+          detailContainer.innerHTML = '<div class="empty-state"><div class="icon"><i class="fas fa-list"></i></div><p>No referral records yet</p></div>';
         } else {
           allReferralDetails.sort((a,b) => (b.joinedAt || 0) - (a.joinedAt || 0));
           let html = '';
           allReferralDetails.slice(0, 30).forEach(r => {
             const badge = r.qualified 
-              ? '<span style="color:#00b894; font-weight:800;">✅ Qualified</span>' 
-              : '<span style="color:#ff4757; font-weight:800;">❌ Not Qualified</span>';
-            html += `<div style="padding:10px 12px; background:#fff; border:1px solid #eee; border-radius:10px; margin-bottom:8px; font-size:0.82rem;">
-              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                <span><b>${r.referrerName}</b> <span style="color:#888; font-size:0.7rem;">(${r.referrerId})</span></span>
-                <span style="color:#888; font-size:0.7rem;">${new Date(r.joinedAt).toLocaleDateString()}</span>
+              ? '<span class="ref-qualified">✅ Qualified</span>' 
+              : '<span class="ref-notqualified">❌ Not Qualified</span>';
+            html += `<div class="ref-detail-item">
+              <div class="ref-detail-row">
+                <span><span class="ref-detail-name">${r.referrerName}</span><span class="ref-detail-id">(${r.referrerId})</span></span>
+                <span style="color:#94a3b8; font-size:0.7rem;">${new Date(r.joinedAt).toLocaleDateString()}</span>
               </div>
-              <div style="display:flex; justify-content:space-between;">
-                <span>↳ ${r.referredName} <span style="color:#888; font-size:0.7rem;">(${r.referredId})</span></span>
-                <span>💰 ${r.referredBalance.toFixed(2)} TK ${badge}</span>
+              <div class="ref-detail-row">
+                <span>↳ <span class="ref-detail-name">${r.referredName}</span><span class="ref-detail-id">(${r.referredId})</span></span>
+                <span><span class="ref-detail-bal">${r.referredBalance.toFixed(2)} TK</span> ${badge}</span>
               </div>
             </div>`;
           });
-          if (allReferralDetails.length > 30) {
-            html += `<p style="text-align:center; color:#888; font-size:0.8rem;">+ ${allReferralDetails.length - 30} more...</p>`;
-          }
+          if (allReferralDetails.length > 30) html += `<p style="text-align:center; color:#94a3b8; font-size:0.8rem; font-weight:600; margin-top:8px;">+ ${allReferralDetails.length - 30} more...</p>`;
           detailContainer.innerHTML = html;
         }
-      } catch(e) {
-        console.error('Error loading referral stats:', e);
-      }
+      } catch(e) { console.error('Error loading referral stats:', e); }
     }
 
     function refreshReferralStats() {
-      toast('Refreshing referral stats...');
+      toast('Refreshing...');
       loadReferralStats();
     }
 
-    // ===================================================
-    // ✅ INIT
-    // ===================================================
+    // ===== INIT =====
     window.onload = function() {
       loadAnalytics();
       loadVerificationStats();
