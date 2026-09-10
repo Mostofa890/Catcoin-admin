@@ -56,7 +56,6 @@
       letter-spacing: -0.01em;
     }
 
-    /* ============= ANIMATED BACKGROUND ============= */
     body::before {
       content: '';
       position: fixed;
@@ -78,7 +77,6 @@
 
     .container { max-width: 680px; margin: 0 auto; padding: 0 16px; }
 
-    /* ============= MODERN HEADER ============= */
     .header {
       background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
       color: #fff;
@@ -172,7 +170,6 @@
       50% { opacity: 0.7; transform: scale(1.1); }
     }
 
-    /* ============= MODERN TABS ============= */
     .tabs-wrapper {
       position: relative;
       z-index: 2;
@@ -225,7 +222,6 @@
     }
     .tab.active i { transform: scale(1.1); }
 
-    /* ============= TAB CONTENT ============= */
     .tab-content {
       display: none;
       padding-top: 24px;
@@ -237,7 +233,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ============= MODERN CARDS ============= */
     .card {
       background: var(--surface);
       padding: 20px;
@@ -287,7 +282,6 @@
     .icon-purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
     .icon-cyan { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
 
-    /* ============= MODERN FORM ELEMENTS ============= */
     .form-group { margin-bottom: 16px; }
     label {
       display: block;
@@ -326,7 +320,6 @@
       padding-right: 42px;
     }
 
-    /* ============= MODERN BUTTONS ============= */
     .btn {
       width: 100%;
       padding: 14px 20px;
@@ -379,7 +372,6 @@
     }
     .btn-small:hover { box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15); }
 
-    /* ============= STAT CARDS (MODERN) ============= */
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -430,7 +422,6 @@
       margin-top: 6px;
     }
 
-    /* ============= MODERN USER CARDS ============= */
     .user-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -554,7 +545,6 @@
       margin-top: 8px;
     }
 
-    /* ============= BADGES ============= */
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -586,7 +576,6 @@
     .ref-level-badge.gold { background: rgba(245, 158, 11, 0.15); color: #b45309; }
     .ref-level-badge.platinum { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15)); color: var(--primary); }
 
-    /* ============= MODERN ALERT BOXES ============= */
     .alert-box {
       padding: 14px 16px;
       border-radius: var(--radius-sm);
@@ -621,7 +610,6 @@
       color: #991b1b;
     }
 
-    /* ============= MODERN TOAST ============= */
     .toast {
       position: fixed;
       top: 24px;
@@ -648,7 +636,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ============= WITHDRAWAL CARDS ============= */
     .wd-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -700,7 +687,6 @@
     .wd-actions { display: flex; gap: 8px; }
     .wd-actions .btn { flex: 1; }
 
-    /* ============= LEVEL EDIT ITEMS ============= */
     .level-edit-item {
       background: var(--bg-alt);
       padding: 14px;
@@ -739,7 +725,6 @@
     }
     .level-fields input.wide { width: 110px; }
 
-    /* ============= CHANNEL ITEMS ============= */
     .channel-item {
       display: flex;
       gap: 8px;
@@ -775,7 +760,6 @@
     .channel-verified-item .ch-name { font-weight: 800; font-size: 0.85rem; color: var(--text); }
     .channel-verified-item .ch-id { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
 
-    /* ============= SEARCH BOX ============= */
     .search-box {
       position: relative;
       margin-bottom: 16px;
@@ -794,7 +778,6 @@
       pointer-events: none;
     }
 
-    /* ============= ACTIVITY TABLE (MODERN) ============= */
     .activity-table {
       width: 100%;
       font-size: 0.82rem;
@@ -824,7 +807,6 @@
     .activity-table tbody tr td:last-child { border-radius: 0 10px 10px 0; }
     .activity-table .user-id { font-weight: 700; color: var(--primary); }
 
-    /* ============= MODERN TASK ITEMS ============= */
     .task-admin-item {
       background: var(--bg-alt);
       padding: 14px;
@@ -859,7 +841,6 @@
       margin-top: 4px;
     }
 
-    /* ============= AD SLOT BOX ============= */
     .ad-slot-box {
       background: var(--bg-alt);
       padding: 16px;
@@ -884,7 +865,6 @@
       border-radius: 9px;
     }
 
-    /* ============= STATS MINI GRID ============= */
     .stat-mini-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -916,7 +896,6 @@
       margin-top: 6px;
     }
 
-    /* ============= REFERRAL DETAIL ITEM ============= */
     .ref-detail-item {
       padding: 12px 14px;
       background: var(--bg-alt);
@@ -941,7 +920,6 @@
     .ref-qualified { color: var(--success); font-weight: 800; }
     .ref-notqualified { color: var(--danger); font-weight: 800; }
 
-    /* ============= LEADERBOARD ITEM ============= */
     .leaderboard-item {
       display: flex;
       align-items: center;
@@ -968,7 +946,6 @@
     .leaderboard-qualified { font-weight: 900; color: var(--success); font-size: 1rem; }
     .leaderboard-total { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
 
-    /* ============= EMPTY STATE ============= */
     .empty-state {
       text-align: center;
       padding: 40px 20px;
@@ -991,7 +968,6 @@
       font-weight: 700;
     }
 
-    /* ============= NOT VERIFIED USER ITEM ============= */
     .nv-user-item {
       display: flex;
       justify-content: space-between;
@@ -1007,7 +983,120 @@
     .nv-user-id { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;}
     .nv-user-last { font-size: 0.68rem; color: var(--text-secondary); font-weight: 700; }
 
-    /* ============= RESPONSIVE ============= */
+    /* ✅ NEW: Commission Mode Selector Styles */
+    .mode-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .mode-option {
+      padding: 16px 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+      position: relative;
+    }
+    .mode-option:hover {
+      border-color: var(--primary-light);
+      background: var(--bg-alt);
+    }
+    .mode-option.selected {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+      box-shadow: 0 4px 12px rgba(99,102,241,0.2);
+    }
+    .mode-option.selected.deduct-mode {
+      border-color: var(--warning);
+      background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(251,191,36,0.08));
+      box-shadow: 0 4px 12px rgba(245,158,11,0.2);
+    }
+    .mode-option .mode-icon {
+      font-size: 1.75rem;
+      margin-bottom: 6px;
+    }
+    .mode-option .mode-title {
+      font-weight: 900;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .mode-option .mode-desc {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .mode-option.selected .mode-check {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+    .mode-option.selected.deduct-mode .mode-check {
+      background: var(--warning);
+    }
+    .mode-option .mode-check {
+      display: none;
+    }
+    .mode-option.selected .mode-check {
+      display: flex;
+    }
+
+    /* ✅ NEW: Cycle Info Card */
+    .cycle-info-box {
+      background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+      color: #fff;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cycle-info-box::before {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      top: -60px;
+      right: -40px;
+    }
+    .cycle-info-box .cycle-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      opacity: 0.85;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      position: relative;
+    }
+    .cycle-info-box .cycle-value {
+      font-size: 1.05rem;
+      font-weight: 900;
+      margin-top: 4px;
+      position: relative;
+    }
+    .cycle-info-box .cycle-desc {
+      font-size: 0.72rem;
+      opacity: 0.85;
+      margin-top: 8px;
+      font-weight: 600;
+      line-height: 1.4;
+      position: relative;
+    }
+
     @media (max-width: 400px) {
       .container { padding: 0 12px; }
       .card { padding: 16px; border-radius: 20px; }
@@ -1079,12 +1168,13 @@
           </div>
         </div>
         <div class="form-group"><label>Daily Login Bonus (Amount)</label><input type="number" id="dailyBonusAmount" placeholder="20"></div>
-        <div class="form-group"><label>Bonus Per Referral</label><input type="number" id="refBonus" placeholder="5"></div>
+        <div class="form-group"><label>Bonus Per Referral (One-time)</label><input type="number" id="refBonus" placeholder="5"></div>
         <div class="form-group">
           <label>Minimum Referral Balance Requirement</label>
           <input type="number" id="minReferralBalance" placeholder="20" value="20">
           <small style="font-size:0.72rem; color:#94a3b8; font-weight:600;">Referral counts as valid only if referred user has this much balance</small>
         </div>
+        
         <div class="form-group">
           <label>Referral Levels</label>
           <div style="background:var(--bg-alt); padding:14px; border-radius:12px; font-size:0.82rem; color:#475569; border:1.5px solid var(--border);">
@@ -1098,6 +1188,40 @@
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:4px 0; font-weight:700;"><span>PLATINUM</span><span>50</span><span>👑</span></div>
           </div>
         </div>
+
+        <!-- ✅ NEW: Commission Rate -->
+        <div class="form-group">
+          <label>Commission Rate (%) — Ongoing Earnings</label>
+          <input type="number" id="refCommissionRate" placeholder="2" value="2" min="0" max="50" step="0.1">
+          <small style="font-size:0.72rem; color:#94a3b8; font-weight:600;">Referred users earn → Referrer gets this % every time</small>
+        </div>
+
+        <!-- ✅ NEW: Commission Mode Selector -->
+        <div class="form-group">
+          <label>Commission Mode</label>
+          <div class="mode-selector">
+            <div class="mode-option" id="modeOption-bonus" onclick="selectCommissionMode('bonus')">
+              <div class="mode-check"><i class="fas fa-check"></i></div>
+              <div class="mode-icon">🎁</div>
+              <div class="mode-title">Bonus Mode</div>
+              <div class="mode-desc">User keeps 100% income<br>Commission from app margin</div>
+            </div>
+            <div class="mode-option" id="modeOption-deduct" onclick="selectCommissionMode('deduct')">
+              <div class="mode-check"><i class="fas fa-check"></i></div>
+              <div class="mode-icon">💸</div>
+              <div class="mode-title">Deduct Mode</div>
+              <div class="mode-desc">Cut from user's income<br>Saves your cost</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-box info" id="modeInfoBox" style="margin-top:4px;">
+          <i class="fas fa-info-circle"></i>
+          <div id="modeInfoText">
+            <b>Bonus Mode:</b> Referred user keeps 100% income. Referrer's commission comes from your app margin. User experience is positive, but costs more.
+          </div>
+        </div>
+
         <div class="form-group"><label>Tutorial Video Link</label><input type="text" id="tutorialLink" placeholder="https://youtube.com/..."></div>
         <div class="form-group"><label>Support Channel Link</label><input type="text" id="supportLink" placeholder="https://t.me/your_group"></div>
       </div>
@@ -1269,8 +1393,16 @@
             Ad Networks Config
           </div>
         </div>
-        <div class="form-group"><label>Daily Ad Viewing Limit</label><input type="number" id="dailyAdLimit" placeholder="10"></div>
+        <div class="form-group"><label>Daily Ad Viewing Limit (Per Cycle)</label><input type="number" id="dailyAdLimit" placeholder="10"></div>
         <div class="form-group"><label>Reward Per Ad Watch</label><input type="number" step="0.01" id="adReward" placeholder="0.5"></div>
+
+        <!-- ✅ NEW: AM/PM Cycle Info -->
+        <div class="cycle-info-box">
+          <div class="cycle-title">⚡ AM/PM Ad Cycle</div>
+          <div class="cycle-value">🔁 2 Cycles Per Day</div>
+          <div class="cycle-desc">🌅 AM Cycle: 12:00 AM - 11:59 AM<br>🌙 PM Cycle: 12:00 PM - 11:59 PM<br>Users get fresh ads after each cycle reset.</div>
+        </div>
+
         <div id="adsContainer"></div>
         <button class="btn" onclick="saveAds()"><i class="fas fa-save"></i> Save Ad Settings</button>
       </div>
@@ -1384,6 +1516,7 @@
     let channelLinks = [];
     let withdrawLevels = [];
     let MIN_REFERRAL_BALANCE = 20;
+    let selectedCommissionMode = 'bonus'; // ✅ NEW
 
     const REFERRAL_LEVELS = {
       BEGINNER: { min: 0, label: '⭐ BEGINNER', class: 'beginner' },
@@ -1418,6 +1551,36 @@
       if(id === 'analytics') loadAnalytics();
       if(id === 'channels') { loadVerificationStats(); loadNotVerifiedUsers(); renderCurrentChannels(); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ===================================================
+    // ✅ NEW: COMMISSION MODE SELECTOR
+    // ===================================================
+    function selectCommissionMode(mode) {
+      selectedCommissionMode = mode;
+      
+      const bonusEl = document.getElementById('modeOption-bonus');
+      const deductEl = document.getElementById('modeOption-deduct');
+      const infoBox = document.getElementById('modeInfoBox');
+      const infoText = document.getElementById('modeInfoText');
+      
+      bonusEl.classList.remove('selected');
+      deductEl.classList.remove('selected');
+      
+      if (mode === 'bonus') {
+        bonusEl.classList.add('selected');
+        infoBox.className = 'alert-box info';
+        infoText.innerHTML = '<b>Bonus Mode:</b> Referred user keeps 100% income. Referrer\'s commission comes from your app margin. <b>User experience is positive</b>, but costs more.';
+      } else {
+        deductEl.classList.add('selected');
+        deductEl.classList.add('deduct-mode');
+        infoBox.className = 'alert-box warning';
+        infoText.innerHTML = '<b>Deduct Mode:</b> Commission is <b>cut from the referred user\'s income</b>. User earns less (e.g., 1 TK → 0.98 TK). Saves your cost but user might notice.';
+      }
+    }
+
+    function updateCommissionModeUI(mode) {
+      selectCommissionMode(mode);
     }
 
     // ===== CHANNELS =====
@@ -1637,6 +1800,12 @@
         document.getElementById('minReferralBalance').value = configData.minReferralBalance || 20;
         MIN_REFERRAL_BALANCE = configData.minReferralBalance || 20;
         document.getElementById('minRefBalNote').textContent = MIN_REFERRAL_BALANCE + '+';
+        
+        // ✅ NEW: Load commission settings
+        document.getElementById('refCommissionRate').value = configData.refCommissionRate || 2;
+        selectedCommissionMode = configData.refCommissionMode || 'bonus';
+        updateCommissionModeUI(selectedCommissionMode);
+        
         document.getElementById('tutorialLink').value = configData.tutorialLink || '';
         document.getElementById('supportLink').value = configData.supportLink || '';
         document.getElementById('minWithdraw').value = configData.minWithdraw || 10;
@@ -1692,6 +1861,8 @@
         dailyBonusAmount: Number(document.getElementById('dailyBonusAmount').value),
         refBonus: Number(document.getElementById('refBonus').value),
         minReferralBalance: Number(document.getElementById('minReferralBalance').value) || 20,
+        refCommissionRate: Number(document.getElementById('refCommissionRate').value) || 2, // ✅ NEW
+        refCommissionMode: selectedCommissionMode, // ✅ NEW
         tutorialLink: document.getElementById('tutorialLink').value,
         supportLink: document.getElementById('supportLink').value,
         minWithdraw: Number(document.getElementById('minWithdraw').value),
