@@ -1137,7 +1137,7 @@
     let currentSubmissions = [];
     let currentFilter = 'pending';
     
-    // ✅ NEW: Task Editing & Image Upload State
+    // ✅ Task Editing & Image Upload State
     let editingTaskId = null;
     const IMGBB_API_KEY = "bc5a5bca9a50833046600a2cc94de6c6";
 
@@ -1178,7 +1178,7 @@
     }
 
     // ===================================================
-    // ✅ NEW: IMAGE UPLOAD TO IMGBB
+    // ✅ IMAGE UPLOAD TO IMGBB
     // ===================================================
     async function uploadExampleImageToImgBB(file) {
       return new Promise(async (resolve, reject) => {
@@ -1408,7 +1408,7 @@
     });
 
     // ===================================================
-    // ✅ TASK MANAGEMENT (UPDATED)
+    // ✅ TASK MANAGEMENT
     // ===================================================
     let tempInputs = [];
     let tempImages = [];
@@ -1714,6 +1714,17 @@
       try {
         await db.ref('taskSubmissions/' + subId).update({ status: 'approved' });
         
+        // ✅ Increment submittedCount for the task (Only when Admin Approves)
+        const subSnap = await db.ref('taskSubmissions/' + subId).once('value');
+        const sub = subSnap.val();
+        const taskSnap = await db.ref('config/newTasks/' + sub.taskId).once('value');
+        if (taskSnap.exists()) {
+          const taskData = taskSnap.val();
+          const currentSubmitted = taskData.submittedCount || 0;
+          await db.ref('config/newTasks/' + sub.taskId).update({ submittedCount: currentSubmitted + 1 });
+        }
+        // ✅ End of increment logic
+
         const userRef = db.ref('users/' + userId);
         const snap = await userRef.once('value');
         if (snap.exists()) {
@@ -1724,8 +1735,6 @@
           });
         }
         
-        const subSnap = await db.ref('taskSubmissions/' + subId).once('value');
-        const sub = subSnap.val();
         try {
           await fetch('https://api.telegram.org/bot' + (configData.botToken || '8072034659:AAE_I05sswA8gBYVOSHtjGEf1LE6i6aq0T8') + '/sendMessage', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1807,7 +1816,7 @@
     }
 
     // ===================================================
-    // ✅ CHANNELS & SETTINGS (SAME AS BEFORE)
+    // ✅ CHANNELS & SETTINGS
     // ===================================================
     function renderChannelLinks() {
       const container = document.getElementById('channelLinksContainer');
